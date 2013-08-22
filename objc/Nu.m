@@ -10495,8 +10495,7 @@ static void nu_swizzleContainerClasses(){
     if (_value) return _value;
     
     // Undefined globals evaluate to null.
-    if (c == '$')
-        return [NSNull null];
+    if (c == '$') return [NSNull null];
     
     // Now we try looking in the bridge support dictionaries.
     NuSymbolTable *symbolTable = [context objectForKey:SYMBOLS_KEY];
