@@ -8665,7 +8665,6 @@ static id regexWithString(NSString *string){
 #define NU_MAX_PARSER_MACRO_DEPTH 1000
 
 @interface NuParser (){
-    int _start;
     int _column;
     
 	NSMutableArray* _readerMacroStack;
@@ -9279,7 +9278,6 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                     //NSLog(@"continuing parsing with:%s", &str[i+1]);
                     //NSLog(@"ok------------");
                     _state = NUPaserStateNormal;
-                    _start = -1;
                 }
                 else {
                     if (_parseEscapes && (stri == '\\')) {
