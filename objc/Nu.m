@@ -6874,7 +6874,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 - (id) evalWithArguments:(id)cdr context:(NSMutableDictionary *)context {return [self callWithArguments:cdr context:context];}
 @end
 
-@interface Nu_car_operator : NuOperator {}
+@interface Nu_car_operator : NuOperator
 @end
 
 @implementation Nu_car_operator
@@ -6888,7 +6888,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_cdr_operator : NuOperator {}
+@interface Nu_cdr_operator : NuOperator
 @end
 
 @implementation Nu_cdr_operator
@@ -6902,7 +6902,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_atom_operator : NuOperator {}
+@interface Nu_atom_operator : NuOperator
 @end
 
 @implementation Nu_atom_operator
@@ -6920,7 +6920,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_defined_operator : NuOperator {}
+@interface Nu_defined_operator : NuOperator
 @end
 
 @implementation Nu_defined_operator
@@ -6951,7 +6951,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_eq_operator : NuOperator {}
+@interface Nu_eq_operator : NuOperator
 @end
 
 @implementation Nu_eq_operator
@@ -6973,7 +6973,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_neq_operator : NuOperator {}
+@interface Nu_neq_operator : NuOperator
 @end
 
 @implementation Nu_neq_operator
@@ -6997,7 +6997,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_cons_operator : NuOperator {}
+@interface Nu_cons_operator : NuOperator
 @end
 
 @implementation Nu_cons_operator
@@ -7015,7 +7015,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_append_operator : NuOperator {}
+@interface Nu_append_operator : NuOperator
 @end
 
 @implementation Nu_append_operator
@@ -7047,7 +7047,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 @end
 
 
-@interface Nu_apply_operator : NuOperator {}
+@interface Nu_apply_operator : NuOperator
 @end
 
 @implementation Nu_apply_operator
@@ -7119,7 +7119,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 }
 @end
 
-@interface Nu_cond_operator : NuOperator {}
+@interface Nu_cond_operator : NuOperator
 @end
 
 @implementation Nu_cond_operator
@@ -7146,7 +7146,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_case_operator : NuOperator {}
+@interface Nu_case_operator : NuOperator
 @end
 
 @implementation Nu_case_operator
@@ -7180,7 +7180,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_if_operator : NuOperator {}
+@interface Nu_if_operator : NuOperator
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context flipped:(bool)flip;
 @end
 
@@ -7249,7 +7249,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_unless_operator : Nu_if_operator {}
+@interface Nu_unless_operator : Nu_if_operator
 @end
 
 @implementation Nu_unless_operator
@@ -7260,7 +7260,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_while_operator : NuOperator {}
+@interface Nu_while_operator : NuOperator
 @end
 
 @implementation Nu_while_operator
@@ -7293,7 +7293,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_until_operator : NuOperator {}
+@interface Nu_until_operator : NuOperator
 @end
 
 @implementation Nu_until_operator
@@ -7326,7 +7326,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_for_operator : NuOperator {}
+@interface Nu_for_operator : NuOperator
 @end
 
 @implementation Nu_for_operator
@@ -7369,7 +7369,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_try_operator : NuOperator {}
+@interface Nu_try_operator : NuOperator
 @end
 
 @implementation Nu_try_operator
@@ -7446,7 +7446,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_throw_operator : NuOperator {}
+@interface Nu_throw_operator : NuOperator
 @end
 
 @implementation Nu_throw_operator
@@ -7459,7 +7459,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_synchronized_operator : NuOperator {}
+@interface Nu_synchronized_operator : NuOperator
 @end
 
 @implementation Nu_synchronized_operator
@@ -7484,7 +7484,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_quote_operator : NuOperator {}
+@interface Nu_quote_operator : NuOperator
 @end
 
 @implementation Nu_quote_operator
@@ -7496,7 +7496,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_quasiquote_eval_operator : NuOperator {}
+@interface Nu_quasiquote_eval_operator : NuOperator
 @end
 
 @implementation Nu_quasiquote_eval_operator
@@ -7514,7 +7514,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_quasiquote_splice_operator : NuOperator {}
+@interface Nu_quasiquote_splice_operator : NuOperator
 @end
 
 @implementation Nu_quasiquote_splice_operator
@@ -7539,7 +7539,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 #define QuasiLog(args...)
 #endif
 
-@interface Nu_quasiquote_operator : NuOperator {}
+@interface Nu_quasiquote_operator : NuOperator
 @end
 
 @implementation Nu_quasiquote_operator
@@ -7675,7 +7675,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_context_operator : NuOperator {}
+@interface Nu_context_operator : NuOperator
 @end
 
 @implementation Nu_context_operator
@@ -7686,7 +7686,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_set_operator : NuOperator {}
+@interface Nu_set_operator : NuOperator
 @end
 
 @implementation Nu_set_operator
@@ -7730,7 +7730,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_local_operator : NuOperator {}
+@interface Nu_local_operator : NuOperator
 @end
 
 @implementation Nu_local_operator
@@ -7747,7 +7747,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 @end
 
 
-@interface Nu_global_operator : NuOperator {}
+@interface Nu_global_operator : NuOperator
 @end
 
 @implementation Nu_global_operator
@@ -7763,7 +7763,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_regex_operator : NuOperator {}
+@interface Nu_regex_operator : NuOperator
 @end
 
 @implementation Nu_regex_operator
@@ -7776,7 +7776,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_do_operator : NuOperator {}
+@interface Nu_do_operator : NuOperator
 @end
 
 @implementation Nu_do_operator
@@ -7790,7 +7790,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_function_operator : NuOperator {}
+@interface Nu_function_operator : NuOperator
 @end
 
 @implementation Nu_function_operator
@@ -7811,7 +7811,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_label_operator : NuOperator {}
+@interface Nu_label_operator : NuOperator
 @end
 
 @implementation Nu_label_operator
@@ -7829,7 +7829,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_macro_0_operator : NuOperator {}
+@interface Nu_macro_0_operator : NuOperator
 @end
 
 @implementation Nu_macro_0_operator
@@ -7846,7 +7846,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_macro_1_operator : NuOperator {}
+@interface Nu_macro_1_operator : NuOperator
 @end
 
 @implementation Nu_macro_1_operator
@@ -7864,7 +7864,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_macrox_operator : NuOperator {}
+@interface Nu_macrox_operator : NuOperator
 @end
 
 @implementation Nu_macrox_operator
@@ -7887,7 +7887,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_list_operator : NuOperator {}
+@interface Nu_list_operator : NuOperator
 @end
 
 @implementation Nu_list_operator
@@ -7914,7 +7914,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_add_operator : NuOperator {}
+@interface Nu_add_operator : NuOperator 
 @end
 
 @implementation Nu_add_operator
@@ -7956,7 +7956,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_multiply_operator : NuOperator {}
+@interface Nu_multiply_operator : NuOperator
 @end
 
 @implementation Nu_multiply_operator
@@ -7973,7 +7973,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_subtract_operator : NuOperator {}
+@interface Nu_subtract_operator : NuOperator
 @end
 
 @implementation Nu_subtract_operator
@@ -8008,7 +8008,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_exponentiation_operator : NuOperator {}
+@interface Nu_exponentiation_operator : NuOperator
 @end
 
 @implementation Nu_exponentiation_operator
@@ -8026,7 +8026,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_divide_operator : NuOperator {}
+@interface Nu_divide_operator : NuOperator
 @end
 
 @implementation Nu_divide_operator
@@ -8044,7 +8044,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_modulus_operator : NuOperator {}
+@interface Nu_modulus_operator : NuOperator
 @end
 
 @implementation Nu_modulus_operator
@@ -8062,7 +8062,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_bitwiseand_operator : NuOperator {}
+@interface Nu_bitwiseand_operator : NuOperator
 @end
 
 @implementation Nu_bitwiseand_operator
@@ -8080,7 +8080,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_bitwiseor_operator : NuOperator {}
+@interface Nu_bitwiseor_operator : NuOperator
 @end
 
 @implementation Nu_bitwiseor_operator
@@ -8098,7 +8098,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_greaterthan_operator : NuOperator {}
+@interface Nu_greaterthan_operator : NuOperator
 @end
 
 @implementation Nu_greaterthan_operator
@@ -8121,7 +8121,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_lessthan_operator : NuOperator {}
+@interface Nu_lessthan_operator : NuOperator
 @end
 
 @implementation Nu_lessthan_operator
@@ -8144,7 +8144,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_gte_operator : NuOperator {}
+@interface Nu_gte_operator : NuOperator
 @end
 
 @implementation Nu_gte_operator
@@ -8167,7 +8167,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_lte_operator : NuOperator {}
+@interface Nu_lte_operator : NuOperator
 @end
 
 @implementation Nu_lte_operator
@@ -8190,7 +8190,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_leftshift_operator : NuOperator {}
+@interface Nu_leftshift_operator : NuOperator
 @end
 
 @implementation Nu_leftshift_operator
@@ -8203,7 +8203,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_rightshift_operator : NuOperator {}
+@interface Nu_rightshift_operator : NuOperator
 @end
 
 @implementation Nu_rightshift_operator
@@ -8216,7 +8216,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_and_operator : NuOperator {}
+@interface Nu_and_operator : NuOperator
 @end
 
 @implementation Nu_and_operator
@@ -8235,7 +8235,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_or_operator : NuOperator {}
+@interface Nu_or_operator : NuOperator
 @end
 
 @implementation Nu_or_operator
@@ -8253,7 +8253,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_not_operator : NuOperator {}
+@interface Nu_not_operator : NuOperator
 @end
 
 @implementation Nu_not_operator
@@ -8271,12 +8271,12 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 @end
 
 #if !TARGET_OS_IPHONE
-@interface NuConsoleViewController : NSObject {}
+@interface NuConsoleViewController : NSObject
 - (void) write:(id) string;
 @end
 #endif
 
-@interface Nu_puts_operator : NuOperator {}
+@interface Nu_puts_operator : NuOperator
 @end
 
 @implementation Nu_puts_operator
@@ -8313,7 +8313,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 @end
 
 #if !TARGET_OS_IPHONE
-@interface Nu_gets_operator : NuOperator {}
+@interface Nu_gets_operator : NuOperator
 @end
 
 @implementation Nu_gets_operator
@@ -8327,7 +8327,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 @end
 #endif
 
-@interface Nu_print_operator : NuOperator {}
+@interface Nu_print_operator : NuOperator
 @end
 
 @implementation Nu_print_operator
@@ -8358,7 +8358,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_call_operator : NuOperator {}
+@interface Nu_call_operator : NuOperator
 @end
 
 @implementation Nu_call_operator
@@ -8372,7 +8372,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_send_operator : NuOperator {}
+@interface Nu_send_operator : NuOperator
 @end
 
 @implementation Nu_send_operator
@@ -8386,7 +8386,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_progn_operator : NuOperator {}
+@interface Nu_progn_operator : NuOperator
 @end
 
 @implementation Nu_progn_operator
@@ -8403,7 +8403,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_eval_operator : NuOperator {}
+@interface Nu_eval_operator : NuOperator
 @end
 
 @implementation Nu_eval_operator
@@ -8415,7 +8415,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_load_operator : NuOperator {}
+@interface Nu_load_operator : NuOperator
 @end
 
 @implementation Nu_load_operator
@@ -8482,7 +8482,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_let_operator : NuOperator {}
+@interface Nu_let_operator : NuOperator
 @end
 
 @implementation Nu_let_operator
@@ -8527,7 +8527,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_class_operator : NuOperator {}
+@interface Nu_class_operator : NuOperator
 @end
 
 @implementation Nu_class_operator
@@ -8608,7 +8608,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_cmethod_operator : NuOperator {}
+@interface Nu_cmethod_operator : NuOperator
 @end
 
 @implementation Nu_cmethod_operator
@@ -8626,7 +8626,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_imethod_operator : NuOperator {}
+@interface Nu_imethod_operator : NuOperator
 @end
 
 @implementation Nu_imethod_operator
@@ -8644,7 +8644,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_ivar_operator : NuOperator {}
+@interface Nu_ivar_operator : NuOperator
 @end
 
 @implementation Nu_ivar_operator
@@ -8676,7 +8676,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_ivars_operator : NuOperator {}
+@interface Nu_ivars_operator : NuOperator
 @end
 
 @implementation Nu_ivars_operator
@@ -8688,7 +8688,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_ivar_accessors_operator : NuOperator {}
+@interface Nu_ivar_accessors_operator : NuOperator
 @end
 
 @implementation Nu_ivar_accessors_operator
@@ -8700,7 +8700,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_system_operator : NuOperator {}
+@interface Nu_system_operator : NuOperator
 @end
 
 @implementation Nu_system_operator
@@ -8719,7 +8719,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_exit_operator : NuOperator {}
+@interface Nu_exit_operator : NuOperator
 @end
 
 @implementation Nu_exit_operator
@@ -8737,7 +8737,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_sleep_operator : NuOperator {}
+@interface Nu_sleep_operator : NuOperator
 @end
 
 @implementation Nu_sleep_operator
@@ -8756,7 +8756,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_uname_operator : NuOperator {}
+@interface Nu_uname_operator : NuOperator
 @end
 
 @implementation Nu_uname_operator
@@ -8781,7 +8781,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_help_operator : NuOperator {}
+@interface Nu_help_operator : NuOperator
 @end
 
 @implementation Nu_help_operator
@@ -8794,7 +8794,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_break_operator : NuOperator {}
+@interface Nu_break_operator : NuOperator
 @end
 
 @implementation Nu_break_operator
@@ -8807,7 +8807,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_continue_operator : NuOperator {}
+@interface Nu_continue_operator : NuOperator
 @end
 
 @implementation Nu_continue_operator
@@ -8820,7 +8820,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_return_operator : NuOperator {}
+@interface Nu_return_operator : NuOperator
 @end
 
 @implementation Nu_return_operator
@@ -8837,7 +8837,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_return_from_operator : NuOperator {}
+@interface Nu_return_from_operator : NuOperator
 @end
 
 @implementation Nu_return_from_operator
@@ -8860,7 +8860,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_version_operator : NuOperator {}
+@interface Nu_version_operator : NuOperator
 @end
 
 @implementation Nu_version_operator
@@ -8872,7 +8872,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_min_operator : NuOperator {}
+@interface Nu_min_operator : NuOperator
 @end
 
 @implementation Nu_min_operator
@@ -8895,7 +8895,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len)
 
 @end
 
-@interface Nu_max_operator : NuOperator {}
+@interface Nu_max_operator : NuOperator
 @end
 
 @implementation Nu_max_operator
@@ -8939,7 +8939,7 @@ static id evaluatedArguments(id cdr, NSMutableDictionary *context)
     return evaluatedArguments;
 }
 
-@interface Nu_array_operator : NuOperator {}
+@interface Nu_array_operator : NuOperator
 @end
 
 @implementation Nu_array_operator
@@ -8951,7 +8951,7 @@ static id evaluatedArguments(id cdr, NSMutableDictionary *context)
 
 @end
 
-@interface Nu_dict_operator : NuOperator {}
+@interface Nu_dict_operator : NuOperator
 @end
 
 @implementation Nu_dict_operator
@@ -8963,7 +8963,7 @@ static id evaluatedArguments(id cdr, NSMutableDictionary *context)
 
 @end
 
-@interface Nu_parse_operator : NuOperator {}
+@interface Nu_parse_operator : NuOperator
 @end
 
 @implementation Nu_parse_operator
@@ -8977,7 +8977,7 @@ static id evaluatedArguments(id cdr, NSMutableDictionary *context)
 
 @end
 
-@interface Nu_signature_operator : NuOperator {}
+@interface Nu_signature_operator : NuOperator
 @end
 
 @implementation Nu_signature_operator
@@ -10800,7 +10800,7 @@ static NuProfiler *defaultProfiler = nil;
 
 #pragma mark - NuSwizzles.m
 
-@interface NSCFDictionarySwizzles : NSObject {}
+@interface NSCFDictionarySwizzles : NSObject
 @end
 
 @implementation NSCFDictionarySwizzles
@@ -10812,7 +10812,7 @@ static NuProfiler *defaultProfiler = nil;
 
 @end
 
-@interface NSCFArraySwizzles : NSObject {}
+@interface NSCFArraySwizzles : NSObject
 @end
 
 @implementation NSCFArraySwizzles
@@ -10834,7 +10834,7 @@ static NuProfiler *defaultProfiler = nil;
 
 @end
 
-@interface NSCFSetSwizzles : NSObject {}
+@interface NSCFSetSwizzles : NSObject
 @end
 
 @implementation NSCFSetSwizzles
