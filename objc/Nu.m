@@ -8707,7 +8707,9 @@ static id regexWithString(NSString *string){
 - (void) quasiquoteNextElement;
 - (void) quasiquoteEvalNextElement;
 - (void) quasiquoteSpliceNextElement;
+#if !TARGET_OS_IPHONE
 - (int) interact;
+#endif
 @end
 
 @implementation NuParser
@@ -9602,6 +9604,9 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
     return 0;
 }
 #endif
+
+
+#if !TARGET_OS_IPHONE
 + (int) main{
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NuParser *parser = [Nu sharedParser];
@@ -9609,6 +9614,7 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
     [pool drain];
     return result;
 }
+#endif
 
 @end
 
