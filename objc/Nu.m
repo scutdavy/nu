@@ -10217,11 +10217,10 @@ static void nu_swizzleContainerClasses(){
 @interface NuSymbol (){
     NuSymbolTable *_table;
     id _value;
-@public                                       // only for use by the symbol table
-    bool _isLabel;
-    bool _isGensym;                                // in macro evaluation, symbol is replaced with an automatically-generated unique symbol.
-    NSString *_stringValue;			  // let's keep this for efficiency
 }
+@property (nonatomic) bool isLabel;
+@property (nonatomic) bool isGensym;// in macro evaluation, symbol is replaced with an automatically-generated unique symbol.
+@property (nonatomic, copy) NSString *stringValue;
 @end
 
 @interface NuSymbolTable ()
@@ -10404,12 +10403,12 @@ static void nu_swizzleContainerClasses(){
     
     // If not, create it.
     symbol = [[[NuSymbol alloc] init] autorelease];             // keep construction private
-    symbol->_stringValue = [string copy];
+    symbol.stringValue = string;
     
     const char *cstring = [string cStringUsingEncoding:NSUTF8StringEncoding];
     NSUInteger len = strlen(cstring);
-    symbol->_isLabel = (cstring[len - 1] == ':');
-    symbol->_isGensym = (len > 2) && (cstring[0] == '_') && (cstring[1] == '_');
+    symbol.isLabel = (cstring[len - 1] == ':');
+    symbol.isGensym = (len > 2) && (cstring[0] == '_') && (cstring[1] == '_');
     
     // Put the new symbol in the symbol table and return it.
     [self.symbolTable setObject:symbol forKey:string];
@@ -10429,6 +10428,8 @@ static void nu_swizzleContainerClasses(){
 }
 
 @end
+
+
 
 @implementation NuSymbol
 
@@ -10461,14 +10462,6 @@ static void nu_swizzleContainerClasses(){
 
 - (int) intValue{
     return (_value == [NSNull null]) ? 0 : 1;
-}
-
-- (bool) isGensym{
-    return _isGensym;
-}
-
-- (bool) isLabel{
-    return _isLabel;
 }
 
 - (NSString *) labelName{
