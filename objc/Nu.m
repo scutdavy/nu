@@ -9074,7 +9074,7 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                 switch(stri) {
                     case '(':
                         ParserDebug(@"Parser: (  %d on line %d", _column, _linenum);
-                        [_opens push:[NSNumber numberWithInt:_column]];
+                        [_opens push:@(_column)];
                         _parens++;
                         if ([_partial length] == 0) {
                             [self openList];
