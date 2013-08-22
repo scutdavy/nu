@@ -10381,10 +10381,11 @@ static NuSymbolTable *sharedSymbolTable = 0;
 @implementation NuSymbolTable
 
 + (NuSymbolTable *) sharedSymbolTable{
-    if (!sharedSymbolTable) {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
         sharedSymbolTable = [[self alloc] init];
         load_builtins(sharedSymbolTable);
-    }
+    });
     return sharedSymbolTable;
 }
 
