@@ -8578,151 +8578,6 @@ static id evaluatedArguments(id cdr, NSMutableDictionary *context){
 
 @end
 
-#define install(name, class) [(NuSymbol *) [symbolTable symbolWithString:name] setValue:[[[class alloc] init] autorelease]]
-
-void load_builtins(NuSymbolTable *symbolTable);
-
-void load_builtins(NuSymbolTable *symbolTable){
-    [(NuSymbol *) [symbolTable symbolWithString:@"t"] setValue:[symbolTable symbolWithString:@"t"]];
-    [(NuSymbol *) [symbolTable symbolWithString:@"nil"] setValue:Nu__null];
-    [(NuSymbol *) [symbolTable symbolWithString:@"YES"] setValue:[NSNumber numberWithBool:YES]];
-    [(NuSymbol *) [symbolTable symbolWithString:@"NO"] setValue:[NSNumber numberWithBool:NO]];
-    
-    install(@"car",      Nu_car_operator);
-    install(@"cdr",      Nu_cdr_operator);
-    install(@"first",    Nu_car_operator);
-    install(@"rest",     Nu_cdr_operator);
-    install(@"head",     Nu_car_operator);
-    install(@"tail",     Nu_cdr_operator);
-    install(@"atom",     Nu_atom_operator);
-    install(@"defined",  Nu_defined_operator);
-    
-    install(@"eq",       Nu_eq_operator);
-    install(@"==",       Nu_eq_operator);
-    install(@"ne",       Nu_neq_operator);
-    install(@"!=",       Nu_neq_operator);
-    install(@"gt",       Nu_greaterthan_operator);
-    install(@">",        Nu_greaterthan_operator);
-    install(@"lt",       Nu_lessthan_operator);
-    install(@"<",        Nu_lessthan_operator);
-    install(@"ge",       Nu_gte_operator);
-    install(@">=",       Nu_gte_operator);
-    install(@"le",       Nu_lte_operator);
-    install(@"<=",       Nu_lte_operator);
-    
-    install(@"cons",     Nu_cons_operator);
-    install(@"append",   Nu_append_operator);
-    install(@"apply",    Nu_apply_operator);
-    
-    install(@"cond",     Nu_cond_operator);
-    install(@"case",     Nu_case_operator);
-    install(@"if",       Nu_if_operator);
-    install(@"unless",   Nu_unless_operator);
-    install(@"while",    Nu_while_operator);
-    install(@"until",    Nu_until_operator);
-    install(@"for",      Nu_for_operator);
-    install(@"break",    Nu_break_operator);
-    install(@"continue", Nu_continue_operator);
-    install(@"return",   Nu_return_operator);
-    install(@"return-from",   Nu_return_from_operator);
-    
-    install(@"try",      Nu_try_operator);
-    
-    install(@"throw",    Nu_throw_operator);
-    install(@"synchronized", Nu_synchronized_operator);
-    
-    install(@"quote",    Nu_quote_operator);
-    install(@"eval",     Nu_eval_operator);
-    
-    install(@"context",  Nu_context_operator);
-    install(@"set",      Nu_set_operator);
-    install(@"global",   Nu_global_operator);
-    install(@"local",    Nu_local_operator);
-    
-    install(@"regex",    Nu_regex_operator);
-    
-    install(@"function", Nu_function_operator);
-    install(@"def",      Nu_function_operator);
-
-    install(@"progn",    Nu_progn_operator);
-    install(@"then",     Nu_progn_operator);
-    install(@"else",     Nu_progn_operator);
-    
-    install(@"macro",    Nu_macro_1_operator);
-    install(@"macrox",   Nu_macrox_operator);
-    
-    install(@"quasiquote",           Nu_quasiquote_operator);
-    install(@"quasiquote-eval",      Nu_quasiquote_eval_operator);
-    install(@"quasiquote-splice",    Nu_quasiquote_splice_operator);
-    
-    install(@"+",        Nu_add_operator);
-    install(@"-",        Nu_subtract_operator);
-    install(@"*",        Nu_multiply_operator);
-    install(@"/",        Nu_divide_operator);
-    install(@"**",       Nu_exponentiation_operator);
-    install(@"%",        Nu_modulus_operator);
-    
-    install(@"&",        Nu_bitwiseand_operator);
-    install(@"|",        Nu_bitwiseor_operator);
-    install(@"<<",       Nu_leftshift_operator);
-    install(@">>",       Nu_rightshift_operator);
-    
-    install(@"&&",       Nu_and_operator);
-    install(@"||",       Nu_or_operator);
-    
-    install(@"and",      Nu_and_operator);
-    install(@"or",       Nu_or_operator);
-    install(@"not",      Nu_not_operator);
-    
-    install(@"min",      Nu_min_operator);
-    install(@"max",      Nu_max_operator);
-    
-    install(@"list",     Nu_list_operator);
-    
-    install(@"do",       Nu_do_operator);
-    
-#if !TARGET_OS_IPHONE
-    install(@"gets",     Nu_gets_operator);
-#endif
-    install(@"puts",     Nu_puts_operator);
-    install(@"print",    Nu_print_operator);
-    
-    install(@"let",      Nu_let_operator);
-    
-    install(@"load",     Nu_load_operator);
-    
-    install(@"uname",    Nu_uname_operator);
-    install(@"system",   Nu_system_operator);
-    install(@"exit",     Nu_exit_operator);
-    install(@"sleep",    Nu_sleep_operator);
-    
-    install(@"class",    Nu_class_operator);
-    install(@"imethod",  Nu_imethod_operator);
-    install(@"cmethod",  Nu_cmethod_operator);
-    install(@"ivar",     Nu_ivar_operator);
-    install(@"ivars",    Nu_ivars_operator);
-    install(@"ivar-accessors", Nu_ivar_accessors_operator);
-    
-    install(@"call",     Nu_call_operator);
-    install(@"send",     Nu_send_operator);
-    
-    install(@"array",    Nu_array_operator);
-    install(@"dict",     Nu_dict_operator);
-    install(@"parse",    Nu_parse_operator);
-    
-    install(@"help",     Nu_help_operator);
-    install(@"?",        Nu_help_operator);
-    install(@"version",  Nu_version_operator);
-    
-    install(@"signature", Nu_signature_operator);
-    
-    // set some commonly-used globals
-    [(NuSymbol *) [symbolTable symbolWithString:@"NSUTF8StringEncoding"]
-     setValue:[NSNumber numberWithInt:NSUTF8StringEncoding]];
-    
-    [(NuSymbol *) [symbolTable symbolWithString:@"NSLog"] // let's make this an operator someday
-     setValue:[NuBridgedFunction functionWithName:@"NSLog" signature:@"v@"]];
-}
 
 #pragma mark - NuParser.m
 
@@ -10373,9 +10228,7 @@ static void nu_swizzleContainerClasses(){
 @property (nonatomic, strong) NSMutableDictionary *symbolTable;
 @end
 
-void load_builtins(NuSymbolTable *);
-
-
+#define install(name, class) [(NuSymbol *) [symbolTable symbolWithString:name] setValue:[[[class alloc] init] autorelease]]
 @implementation NuSymbolTable
 
 + (NuSymbolTable *) sharedSymbolTable{
@@ -10383,9 +10236,151 @@ void load_builtins(NuSymbolTable *);
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedSymbolTable = [[self alloc] init];
-        load_builtins(sharedSymbolTable);
+        [self loadBuiltIns:sharedSymbolTable];
     });
     return sharedSymbolTable;
+}
+
++ (void) loadBuiltIns:(NuSymbolTable *) symbolTable{
+    [(NuSymbol *) [symbolTable symbolWithString:@"t"] setValue:[symbolTable symbolWithString:@"t"]];
+    [(NuSymbol *) [symbolTable symbolWithString:@"nil"] setValue:Nu__null];
+    [(NuSymbol *) [symbolTable symbolWithString:@"YES"] setValue:[NSNumber numberWithBool:YES]];
+    [(NuSymbol *) [symbolTable symbolWithString:@"NO"] setValue:[NSNumber numberWithBool:NO]];
+    
+    install(@"car",      Nu_car_operator);
+    install(@"cdr",      Nu_cdr_operator);
+    install(@"first",    Nu_car_operator);
+    install(@"rest",     Nu_cdr_operator);
+    install(@"head",     Nu_car_operator);
+    install(@"tail",     Nu_cdr_operator);
+    install(@"atom",     Nu_atom_operator);
+    install(@"defined",  Nu_defined_operator);
+    
+    install(@"eq",       Nu_eq_operator);
+    install(@"==",       Nu_eq_operator);
+    install(@"ne",       Nu_neq_operator);
+    install(@"!=",       Nu_neq_operator);
+    install(@"gt",       Nu_greaterthan_operator);
+    install(@">",        Nu_greaterthan_operator);
+    install(@"lt",       Nu_lessthan_operator);
+    install(@"<",        Nu_lessthan_operator);
+    install(@"ge",       Nu_gte_operator);
+    install(@">=",       Nu_gte_operator);
+    install(@"le",       Nu_lte_operator);
+    install(@"<=",       Nu_lte_operator);
+    
+    install(@"cons",     Nu_cons_operator);
+    install(@"append",   Nu_append_operator);
+    install(@"apply",    Nu_apply_operator);
+    
+    install(@"cond",     Nu_cond_operator);
+    install(@"case",     Nu_case_operator);
+    install(@"if",       Nu_if_operator);
+    install(@"unless",   Nu_unless_operator);
+    install(@"while",    Nu_while_operator);
+    install(@"until",    Nu_until_operator);
+    install(@"for",      Nu_for_operator);
+    install(@"break",    Nu_break_operator);
+    install(@"continue", Nu_continue_operator);
+    install(@"return",   Nu_return_operator);
+    install(@"return-from",   Nu_return_from_operator);
+    
+    install(@"try",      Nu_try_operator);
+    
+    install(@"throw",    Nu_throw_operator);
+    install(@"synchronized", Nu_synchronized_operator);
+    
+    install(@"quote",    Nu_quote_operator);
+    install(@"eval",     Nu_eval_operator);
+    
+    install(@"context",  Nu_context_operator);
+    install(@"set",      Nu_set_operator);
+    install(@"global",   Nu_global_operator);
+    install(@"local",    Nu_local_operator);
+    
+    install(@"regex",    Nu_regex_operator);
+    
+    install(@"function", Nu_function_operator);
+    install(@"def",      Nu_function_operator);
+    
+    install(@"progn",    Nu_progn_operator);
+    install(@"then",     Nu_progn_operator);
+    install(@"else",     Nu_progn_operator);
+    
+    install(@"macro",    Nu_macro_1_operator);
+    install(@"macrox",   Nu_macrox_operator);
+    
+    install(@"quasiquote",           Nu_quasiquote_operator);
+    install(@"quasiquote-eval",      Nu_quasiquote_eval_operator);
+    install(@"quasiquote-splice",    Nu_quasiquote_splice_operator);
+    
+    install(@"+",        Nu_add_operator);
+    install(@"-",        Nu_subtract_operator);
+    install(@"*",        Nu_multiply_operator);
+    install(@"/",        Nu_divide_operator);
+    install(@"**",       Nu_exponentiation_operator);
+    install(@"%",        Nu_modulus_operator);
+    
+    install(@"&",        Nu_bitwiseand_operator);
+    install(@"|",        Nu_bitwiseor_operator);
+    install(@"<<",       Nu_leftshift_operator);
+    install(@">>",       Nu_rightshift_operator);
+    
+    install(@"&&",       Nu_and_operator);
+    install(@"||",       Nu_or_operator);
+    
+    install(@"and",      Nu_and_operator);
+    install(@"or",       Nu_or_operator);
+    install(@"not",      Nu_not_operator);
+    
+    install(@"min",      Nu_min_operator);
+    install(@"max",      Nu_max_operator);
+    
+    install(@"list",     Nu_list_operator);
+    
+    install(@"do",       Nu_do_operator);
+    
+#if !TARGET_OS_IPHONE
+    install(@"gets",     Nu_gets_operator);
+#endif
+    install(@"puts",     Nu_puts_operator);
+    install(@"print",    Nu_print_operator);
+    
+    install(@"let",      Nu_let_operator);
+    
+    install(@"load",     Nu_load_operator);
+    
+    install(@"uname",    Nu_uname_operator);
+    install(@"system",   Nu_system_operator);
+    install(@"exit",     Nu_exit_operator);
+    install(@"sleep",    Nu_sleep_operator);
+    
+    install(@"class",    Nu_class_operator);
+    install(@"imethod",  Nu_imethod_operator);
+    install(@"cmethod",  Nu_cmethod_operator);
+    install(@"ivar",     Nu_ivar_operator);
+    install(@"ivars",    Nu_ivars_operator);
+    install(@"ivar-accessors", Nu_ivar_accessors_operator);
+    
+    install(@"call",     Nu_call_operator);
+    install(@"send",     Nu_send_operator);
+    
+    install(@"array",    Nu_array_operator);
+    install(@"dict",     Nu_dict_operator);
+    install(@"parse",    Nu_parse_operator);
+    
+    install(@"help",     Nu_help_operator);
+    install(@"?",        Nu_help_operator);
+    install(@"version",  Nu_version_operator);
+    
+    install(@"signature", Nu_signature_operator);
+    
+    // set some commonly-used globals
+    [(NuSymbol *) [symbolTable symbolWithString:@"NSUTF8StringEncoding"]
+     setValue:[NSNumber numberWithInt:NSUTF8StringEncoding]];
+    
+    [(NuSymbol *) [symbolTable symbolWithString:@"NSLog"] // let's make this an operator someday
+     setValue:[NuBridgedFunction functionWithName:@"NSLog" signature:@"v@"]];
 }
 
 - (NSMutableDictionary *) symbol_table{
