@@ -8894,7 +8894,7 @@ static id regexWithString(NSString *string){
     return _parens;
 }
 
-- (int) state{
+- (NUPaserState) state{
     return _state;
 }
 
