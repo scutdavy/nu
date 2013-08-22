@@ -8764,8 +8764,7 @@ static id regexWithString(NSString *string){
     
     [_readerMacroStack removeAllObjects];
     
-    int i;
-    for (i = 0; i < NU_MAX_PARSER_MACRO_DEPTH; i++) {
+    for (int i = 0; i < NU_MAX_PARSER_MACRO_DEPTH; i++) {
         _readerMacroDepth[i] = 0;
     }
     
