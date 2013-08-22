@@ -10369,9 +10369,8 @@ static void nu_swizzleContainerClasses(){
 }
 @end
 
-@interface NuSymbolTable (){
-    NSMutableDictionary *_symbol_table;
-}
+@interface NuSymbolTable ()
+@property (nonatomic, strong) NSMutableDictionary *symbolTable;
 @end
 
 void load_builtins(NuSymbolTable *);
@@ -10389,6 +10388,13 @@ void load_builtins(NuSymbolTable *);
     return sharedSymbolTable;
 }
 
+- (NSMutableDictionary *) symbol_table{
+    if (_symbolTable == nil) {
+        _symbolTable = [NSMutableDictionary dictionary];
+    }
+    return _symbolTable;
+}
+
 - (void) dealloc{
     NSLog(@"WARNING: deleting a symbol table. Leaking stored symbols.");
     [super dealloc];
@@ -10396,14 +10402,10 @@ void load_builtins(NuSymbolTable *);
 
 // Designated initializer
 - (NuSymbol *) symbolWithString:(NSString *)string{
-    if (!_symbol_table) _symbol_table = [[NSMutableDictionary alloc] init];
-    
     // If the symbol is already in the table, return it.
     NuSymbol *symbol;
-    symbol = [_symbol_table objectForKey:string];
-    if (symbol) {
-        return symbol;
-    }
+    symbol = [self.symbol_table objectForKey:string];
+    if (symbol) return symbol;
     
     // If not, create it.
     symbol = [[[NuSymbol alloc] init] autorelease];             // keep construction private
@@ -10415,20 +10417,20 @@ void load_builtins(NuSymbolTable *);
     symbol->_isGensym = (len > 2) && (cstring[0] == '_') && (cstring[1] == '_');
     
     // Put the new symbol in the symbol table and return it.
-    [_symbol_table setObject:symbol forKey:string];
+    [self.symbol_table setObject:symbol forKey:string];
     return symbol;
 }
 
 - (NuSymbol *) lookup:(NSString *) string{
-    return [_symbol_table objectForKey:string];
+    return [self.symbol_table objectForKey:string];
 }
 
 - (NSArray *) all{
-    return [_symbol_table allValues];
+    return [self.symbol_table allValues];
 }
 
 - (void) removeSymbol:(NuSymbol *) symbol{
-    [_symbol_table removeObjectForKey:[symbol stringValue]];
+    [self.symbol_table removeObjectForKey:[symbol stringValue]];
 }
 
 @end
