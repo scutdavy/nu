@@ -8665,31 +8665,36 @@ static id regexWithString(NSString *string){
 #define NU_MAX_PARSER_MACRO_DEPTH 1000
 
 @interface NuParser (){
-    int _column;
-    
-	NSMutableArray* _readerMacroStack;
 	int _readerMacroDepth[NU_MAX_PARSER_MACRO_DEPTH];
-    
-    int _filenum;
-    int _linenum;
-    int _parseEscapes;
-    
-    NuCell *_root;
-    NuCell *_current;
-    bool _addToCar;
-    NSMutableString *_hereString;
-    bool _hereStringOpened;
-    NuStack *_stack;
-    NSMutableString *_partial;
-    NSMutableString *_comments;
-    NSString *_pattern;                            // used for herestrings
 }
+
+@property (nonatomic) int column;
+@property (nonatomic) int filenum;
+@property (nonatomic) int linenum;
+
+@property (nonatomic) BOOL parseEscapes;
+
+@property (nonatomic, strong) NuCell *root;
+@property (nonatomic, strong) NuCell *current;
+@property (nonatomic) BOOL addToCar;
+
+@property (nonatomic, strong) NSMutableString *hereString;
+@property (nonatomic) BOOL hereStringOpened;
+
+@property (nonatomic, strong) NuStack *stack;
+
+@property (nonatomic, strong) NSMutableString *partial;
+@property (nonatomic, strong) NSMutableString *comments;
+@property (nonatomic, copy) NSString *pattern; // used for herestrings
+
+@property (nonatomic, strong) NSMutableArray *readerMacroStack;
 
 @property (nonatomic) NUPaserState state;
 @property (nonatomic) int depth;
 @property (nonatomic, strong) NuStack *opens;
 @property (nonatomic, strong) NSMutableDictionary *context;
 @property (nonatomic, strong) NuSymbolTable * symbolTable;
+
 
 - (NSString *) stringValue;
 - (const char *) cStringUsingEncoding:(NSStringEncoding) encoding;
