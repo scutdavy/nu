@@ -8688,7 +8688,6 @@ static id regexWithString(NSString *string){
 
 @property (nonatomic) NUPaserState state;
 @property (nonatomic) int depth;
-@property (nonatomic) int parens;
 @property (nonatomic, strong) NuStack *opens;
 @property (nonatomic, strong) NSMutableDictionary *context;
 @property (nonatomic, strong) NuSymbolTable * symbolTable;
@@ -8752,7 +8751,6 @@ static id regexWithString(NSString *string){
     _state = NUPaserStateNormal;
     [_partial setString:@""];
     _depth = 0;
-    _parens = 0;
     
     [_readerMacroStack removeAllObjects];
     
@@ -9075,7 +9073,6 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                     case '(':
                         ParserDebug(@"Parser: (  %d on line %d", _column, _linenum);
                         [_opens push:@(_column)];
-                        _parens++;
                         if ([_partial length] == 0) {
                             [self openList];
                         }
@@ -9083,8 +9080,6 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                     case ')':
                         ParserDebug(@"Parser: )  %d on line %d", _column, _linenum);
                         [_opens pop];
-                        _parens--;
-                        if (_parens < 0) _parens = 0;
                         if ([_partial length] > 0) {
                             [self addAtom:atomWithString(_partial, _symbolTable)];
                             [_partial setString:@""];
