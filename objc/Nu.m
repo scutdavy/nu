@@ -8665,10 +8665,7 @@ static id regexWithString(NSString *string){
 #define NU_MAX_PARSER_MACRO_DEPTH 1000
 
 @interface NuParser (){
-    NUPaserState _state;
     int _start;
-    int _depth;
-    int _parens;
     int _column;
     
 	NSMutableArray* _readerMacroStack;
@@ -8684,19 +8681,18 @@ static id regexWithString(NSString *string){
     NSMutableString *_hereString;
     bool _hereStringOpened;
     NuStack *_stack;
-    NuStack *_opens;
-    NuSymbolTable *_symbolTable;
-    NSMutableDictionary *_context;
     NSMutableString *_partial;
     NSMutableString *_comments;
     NSString *_pattern;                            // used for herestrings
 }
 
-- (int) depth;
-- (int) parens;
-- (NUPaserState) state;
-- (NuCell *) root;
-- (NuStack *) opens;
+@property (nonatomic) NUPaserState state;
+@property (nonatomic) int depth;
+@property (nonatomic) int parens;
+@property (nonatomic, strong) NuStack *opens;
+@property (nonatomic, strong) NSMutableDictionary *context;
+@property (nonatomic, strong) NuSymbolTable * symbolTable;
+
 - (NSString *) stringValue;
 - (const char *) cStringUsingEncoding:(NSStringEncoding) encoding;
 - (id) init;
@@ -8743,33 +8739,6 @@ static id regexWithString(NSString *string){
     return (_depth > 0) || (_state == NUPaserStateRegex) || (_state == NUPaserStateHereString);
 }
 
-- (int) depth{
-    return _depth;
-}
-
-- (int) parens{
-    return _parens;
-}
-
-- (NUPaserState) state{
-    return _state;
-}
-
-- (NuCell *) root{
-    return [_root cdr];
-}
-
-- (NuStack *) opens{
-    return _opens;
-}
-
-- (NSMutableDictionary *) context{
-    return _context;
-}
-
-- (NuSymbolTable *) symbolTable{
-    return _symbolTable;
-}
 
 - (NSString *) stringValue{
     return [self description];
