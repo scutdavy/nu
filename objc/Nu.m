@@ -10216,11 +10216,11 @@ static void nu_swizzleContainerClasses(){
 
 @interface NuSymbol (){
     NuSymbolTable *_table;
-    id _value;
 }
 @property (nonatomic) bool isLabel;
 @property (nonatomic) bool isGensym;// in macro evaluation, symbol is replaced with an automatically-generated unique symbol.
 @property (nonatomic, copy) NSString *stringValue;
+@property (nonatomic, strong) id value;
 @end
 
 @interface NuSymbolTable ()
@@ -10442,22 +10442,8 @@ static void nu_swizzleContainerClasses(){
     return (self == other) ? 1l : 0l;
 }
 
-- (id) value{
-    return _value;
-}
-
-- (void) setValue:(id)v{
-    [v retain];
-    [_value release];
-    _value = v;
-}
-
 - (NSString *) description{
-    return _stringValue;
-}
-
-- (NSString *) stringValue{
-    return _stringValue;
+    return self.stringValue;
 }
 
 - (int) intValue{
@@ -10496,30 +10482,17 @@ static void nu_swizzleContainerClasses(){
     if (valueInContext)
         return valueInContext;
     
-#if 0
-    // if it's not there, try the next context up
-    id parentContext = [context objectForKey:@"context"];
-    if (parentContext) {
-        valueInContext = [parentContext objectForKey:self];
-        if (valueInContext)
-            return valueInContext;
-    }
-#endif
-    
     // Next, return the global value assigned to the value.
-    if (_value)
-        return _value;
+    if (_value) return _value;
     
     // If the symbol is a label (ends in ':'), then it will evaluate to itself.
-    if (_isLabel)
-        return self;
+    if (_isLabel) return self;
     
     // If the symbol is still unknown, try to find a class with this name.
     id className = [self stringValue];
     // the symbol should retain its value.
     _value = [[NuClass classWithName:className] retain];
-    if (_value)
-        return _value;
+    if (_value) return _value;
     
     // Undefined globals evaluate to null.
     if (c == '$')
