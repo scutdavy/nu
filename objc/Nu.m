@@ -8733,8 +8733,8 @@ void load_builtins(NuSymbolTable *symbolTable){
 #define PARSE_REGEX      4
 
 #define MAX_FILES 1024
-static char *filenames[MAX_FILES];
-static int filecount = 0;
+static char *g_filenames[MAX_FILES];
+static int g_filecount = 0;
 
 // Turn debug output on and off for this file only
 #define PARSER_DEBUG 1
@@ -8746,27 +8746,10 @@ static int filecount = 0;
 #endif
 
 static const char *nu_parsedFilename(int i){
-    return (i < 0) ? NULL: filenames[i];
+    return (i < 0) ? NULL: g_filenames[i];
 }
 
-@interface NuParser(Internal)
-- (int) depth;
-- (int) parens;
-- (int) state;
-- (NuCell *) root;
-- (NuStack *) opens;
-- (NSString *) stringValue;
-- (const char *) cStringUsingEncoding:(NSStringEncoding) encoding;
-- (id) init;
-- (void) openList;
-- (void) closeList;
-- (void) addAtom:(id)atom;
-- (void) quoteNextElement;
-- (void) quasiquoteNextElement;
-- (void) quasiquoteEvalNextElement;
-- (void) quasiquoteSpliceNextElement;
-- (int) interact;
-@end
+
 
 static id atomWithString(NSString *string, NuSymbolTable *symbolTable){
     const char *cstring = [string cStringUsingEncoding:NSUTF8StringEncoding];
@@ -8825,91 +8808,108 @@ static id regexWithString(NSString *string){
 #define NU_MAX_PARSER_MACRO_DEPTH 1000
 
 @interface NuParser (){
-    int state;
-    int start;
-    int depth;
-    int parens;
-    int column;
+    int _state;
+    int _start;
+    int _depth;
+    int _parens;
+    int _column;
     
-	NSMutableArray* readerMacroStack;
-	int readerMacroDepth[NU_MAX_PARSER_MACRO_DEPTH];
+	NSMutableArray* _readerMacroStack;
+	int _readerMacroDepth[NU_MAX_PARSER_MACRO_DEPTH];
     
-    int filenum;
-    int linenum;
-    int parseEscapes;
+    int _filenum;
+    int _linenum;
+    int _parseEscapes;
     
-    NuCell *root;
-    NuCell *current;
-    bool addToCar;
-    NSMutableString *hereString;
-    bool hereStringOpened;
-    NuStack *stack;
-    NuStack *opens;
-    NuSymbolTable *symbolTable;
-    NSMutableDictionary *context;
-    NSMutableString *partial;
-    NSMutableString *comments;
-    NSString *pattern;                            // used for herestrings
+    NuCell *_root;
+    NuCell *_current;
+    bool _addToCar;
+    NSMutableString *_hereString;
+    bool _hereStringOpened;
+    NuStack *_stack;
+    NuStack *_opens;
+    NuSymbolTable *_symbolTable;
+    NSMutableDictionary *_context;
+    NSMutableString *_partial;
+    NSMutableString *_comments;
+    NSString *_pattern;                            // used for herestrings
 }
+
+- (int) depth;
+- (int) parens;
+- (int) state;
+- (NuCell *) root;
+- (NuStack *) opens;
+- (NSString *) stringValue;
+- (const char *) cStringUsingEncoding:(NSStringEncoding) encoding;
+- (id) init;
+- (void) openList;
+- (void) closeList;
+- (void) addAtom:(id)atom;
+- (void) quoteNextElement;
+- (void) quasiquoteNextElement;
+- (void) quasiquoteEvalNextElement;
+- (void) quasiquoteSpliceNextElement;
+- (int) interact;
 @end
 
 @implementation NuParser
 
 + (const char *) filename:(int)i{
-    if ((i < 0) || (i >= filecount))
+    if ((i < 0) || (i >= g_filecount))
         return "";
     else
-        return filenames[i];
+        return g_filenames[i];
 }
 
 - (void) setFilename:(const char *) name{
     if (name == NULL)
-        filenum = -1;
+        _filenum = -1;
     else {
-        filenames[filecount] = strdup(name);
-        filenum = filecount;
-        filecount++;
+        g_filenames[g_filecount] = strdup(name);
+        _filenum = g_filecount;
+        g_filecount++;
     }
-    linenum = 1;
+    _linenum = 1;
 }
 
 - (const char *) filename{
-    if (filenum == -1)
+    if (_filenum == -1)
         return NULL;
     else
-        return filenames[filenum];
+        return g_filenames[_filenum];
 }
 
 - (BOOL) incomplete{
-    return (depth > 0) || (state == PARSE_REGEX) || (state == PARSE_HERESTRING);
+    return (_depth > 0) || (_state == PARSE_REGEX) || (_state == PARSE_HERESTRING);
 }
 
 - (int) depth{
-    return depth;
+    return _depth;
 }
 
 - (int) parens{
-    return parens;
+    return _parens;
 }
 
 - (int) state{
-    return state;
+    return _state;
 }
 
 - (NuCell *) root{
-    return [root cdr];
+    return [_root cdr];
 }
 
 - (NuStack *) opens{
-    return opens;
+    return _opens;
 }
 
 - (NSMutableDictionary *) context{
-    return context;
+    return _context;
 }
 
 - (NuSymbolTable *) symbolTable{
-    return symbolTable;
+    return _symbolTable;
 }
 
 - (NSString *) stringValue{
@@ -8921,46 +8921,46 @@ static id regexWithString(NSString *string){
 }
 
 - (void) reset{
-    state = PARSE_NORMAL;
-    [partial setString:@""];
-    depth = 0;
-    parens = 0;
+    _state = PARSE_NORMAL;
+    [_partial setString:@""];
+    _depth = 0;
+    _parens = 0;
     
-    [readerMacroStack removeAllObjects];
+    [_readerMacroStack removeAllObjects];
     
     int i;
     for (i = 0; i < NU_MAX_PARSER_MACRO_DEPTH; i++) {
-        readerMacroDepth[i] = 0;
+        _readerMacroDepth[i] = 0;
     }
     
-    [root release];
-    root = current = [[NuCell alloc] init];
-    [root setFile:filenum line:linenum];
-    [root setCar:[symbolTable symbolWithString:@"progn"]];
-    addToCar = false;
-    [stack release];
-    stack = [[NuStack alloc] init];
+    [_root release];
+    _root = _current = [[NuCell alloc] init];
+    [_root setFile:_filenum line:_linenum];
+    [_root setCar:[_symbolTable symbolWithString:@"progn"]];
+    _addToCar = false;
+    [_stack release];
+    _stack = [[NuStack alloc] init];
 }
 
 - (id) init{
     if (Nu__null == 0) Nu__null = [NSNull null];
     if ((self = [super init])) {
         
-        filenum = -1;
-        linenum = 1;
-        column = 0;
-        opens = [[NuStack alloc] init];
+        _filenum = -1;
+        _linenum = 1;
+        _column = 0;
+        _opens = [[NuStack alloc] init];
         // attach to symbol table (or create one if we want a separate table per parser)
-        symbolTable = [[NuSymbolTable sharedSymbolTable] retain];
+        _symbolTable = [[NuSymbolTable sharedSymbolTable] retain];
         // create top-level context
-        context = [[NSMutableDictionary alloc] init];
+        _context = [[NSMutableDictionary alloc] init];
         
-        readerMacroStack = [[NSMutableArray alloc] init];
+        _readerMacroStack = [[NSMutableArray alloc] init];
         
-        [context setPossiblyNullObject:self forKey:[symbolTable symbolWithString:@"_parser"]];
-        [context setPossiblyNullObject:symbolTable forKey:SYMBOLS_KEY];
+        [_context setPossiblyNullObject:self forKey:[_symbolTable symbolWithString:@"_parser"]];
+        [_context setPossiblyNullObject:_symbolTable forKey:SYMBOLS_KEY];
         
-        partial = [[NSMutableString alloc] initWithString:@""];
+        _partial = [[NSMutableString alloc] initWithString:@""];
         
         [self reset];
     }
@@ -8969,149 +8969,149 @@ static id regexWithString(NSString *string){
 
 - (void) close{
     // break this retain cycle so the parser can be deleted.
-    [context setPossiblyNullObject:[NSNull null] forKey:[symbolTable symbolWithString:@"_parser"]];
+    [_context setPossiblyNullObject:[NSNull null] forKey:[_symbolTable symbolWithString:@"_parser"]];
 }
 
 - (void) dealloc{
-    [opens release];
-    [context release];
-    [symbolTable release];
-    [root release];
-    [stack release];
-    [comments release];
-    [readerMacroStack release];
-    [pattern release];
-    [partial release];
+    [_opens release];
+    [_context release];
+    [_symbolTable release];
+    [_root release];
+    [_stack release];
+    [_comments release];
+    [_readerMacroStack release];
+    [_pattern release];
+    [_partial release];
     [super dealloc];
 }
 
 - (void) addAtomCell:(id)atom{
-    ParserDebug(@"addAtomCell: depth = %d  atom = %@", depth, [atom stringValue]);
+    ParserDebug(@"addAtomCell: depth = %d  atom = %@", _depth, [atom stringValue]);
     
     // when we have two consecutive labels, concatenate them.
     // this allows us to have ':' characters inside labels.
     if ([atom isKindOfClass:[NuSymbol class]] && [atom isLabel]) {	
-	id currentCar = [current car];
+	id currentCar = [_current car];
 	if ([currentCar isKindOfClass:[NuSymbol class]] && [currentCar isLabel]) {
-		NuSymbol *combinedLabel = [symbolTable symbolWithString:[[currentCar stringValue] stringByAppendingString:[atom stringValue]]];
-		[current setCar:combinedLabel];
+		NuSymbol *combinedLabel = [_symbolTable symbolWithString:[[currentCar stringValue] stringByAppendingString:[atom stringValue]]];
+		[_current setCar:combinedLabel];
 		return;
 	}		
     }
 
     NuCell *newCell;
-    if (comments) {
+    if (_comments) {
         NuCellWithComments *newCellWithComments = [[[NuCellWithComments alloc] init] autorelease];
-        [newCellWithComments setComments:comments];
+        [newCellWithComments setComments:_comments];
         newCell = newCellWithComments;
-        [comments release];
-        comments = nil;
+        [_comments release];
+        _comments = nil;
     }
     else {
         newCell = [[[NuCell alloc] init] autorelease];
-        [newCell setFile:filenum line:linenum];
+        [newCell setFile:_filenum line:_linenum];
     }
-    if (addToCar) {
-        [current setCar:newCell];
-        [stack push:current];
+    if (_addToCar) {
+        [_current setCar:newCell];
+        [_stack push:_current];
     }
     else {
-        [current setCdr:newCell];
+        [_current setCdr:newCell];
     }
-    current = newCell;
-    [current setCar:atom];
-    addToCar = false;
+    _current = newCell;
+    [_current setCar:atom];
+    _addToCar = false;
 }
 
 - (void) openListCell{
-    ParserDebug(@"openListCell: depth = %d", depth);
+    ParserDebug(@"openListCell: depth = %d", _depth);
     
-    depth++;
+    _depth++;
     NuCell *newCell = [[[NuCell alloc] init] autorelease];
-    [newCell setFile:filenum line:linenum];
-    if (addToCar) {
-        [current setCar:newCell];
-        [stack push:current];
+    [newCell setFile:_filenum line:_linenum];
+    if (_addToCar) {
+        [_current setCar:newCell];
+        [_stack push:_current];
     }
     else {
-        [current setCdr:newCell];
+        [_current setCdr:newCell];
     }
-    current = newCell;
+    _current = newCell;
     
-    addToCar = true;
+    _addToCar = true;
 }
 
 - (void) openList{
-    ParserDebug(@"openList: depth = %d", depth);
+    ParserDebug(@"openList: depth = %d", _depth);
     
-    while ([readerMacroStack count] > 0) {
+    while ([_readerMacroStack count] > 0) {
         ParserDebug(@"  openList: readerMacro");
         
         [self openListCell];
-        ++readerMacroDepth[depth];
-        ParserDebug(@"  openList: ++RMD[%d] = %d", depth, readerMacroDepth[depth]);
+        ++_readerMacroDepth[_depth];
+        ParserDebug(@"  openList: ++RMD[%d] = %d", _depth, _readerMacroDepth[_depth]);
         [self addAtomCell:
-         [symbolTable symbolWithString:
-          [readerMacroStack objectAtIndex:0]]];
+         [_symbolTable symbolWithString:
+          [_readerMacroStack objectAtIndex:0]]];
         
-        [readerMacroStack removeObjectAtIndex:0];
+        [_readerMacroStack removeObjectAtIndex:0];
     }
     
     [self openListCell];
 }
 
 - (void) addAtom:(id)atom{
-    ParserDebug(@"addAtom: depth = %d  atom: %@", depth, [atom stringValue]);
+    ParserDebug(@"addAtom: depth = %d  atom: %@", _depth, [atom stringValue]);
     
-    while ([readerMacroStack count] > 0) {
+    while ([_readerMacroStack count] > 0) {
         ParserDebug(@"  addAtom: readerMacro");
         [self openListCell];
-        ++readerMacroDepth[depth];
-        ParserDebug(@"  addAtom: ++RMD[%d] = %d", depth, readerMacroDepth[depth]);
+        ++_readerMacroDepth[_depth];
+        ParserDebug(@"  addAtom: ++RMD[%d] = %d", _depth, _readerMacroDepth[_depth]);
         [self addAtomCell:
-         [symbolTable symbolWithString:[readerMacroStack objectAtIndex:0]]];
+         [_symbolTable symbolWithString:[_readerMacroStack objectAtIndex:0]]];
         
-        [readerMacroStack removeObjectAtIndex:0];
+        [_readerMacroStack removeObjectAtIndex:0];
     }
     
     [self addAtomCell:atom];
     
-    while (readerMacroDepth[depth] > 0) {
-        --readerMacroDepth[depth];
-        ParserDebug(@"  addAtom: --RMD[%d] = %d", depth, readerMacroDepth[depth]);
+    while (_readerMacroDepth[_depth] > 0) {
+        --_readerMacroDepth[_depth];
+        ParserDebug(@"  addAtom: --RMD[%d] = %d", _depth, _readerMacroDepth[_depth]);
         [self closeList];
     }
 }
 
 - (void) closeListCell{
-    ParserDebug(@"closeListCell: depth = %d", depth);
+    ParserDebug(@"closeListCell: depth = %d", _depth);
     
-    --depth;
+    --_depth;
     
-    if (addToCar) {
-        [current setCar:[NSNull null]];
+    if (_addToCar) {
+        [_current setCar:[NSNull null]];
     }
     else {
-        [current setCdr:[NSNull null]];
-        current = [stack pop];
+        [_current setCdr:[NSNull null]];
+        _current = [_stack pop];
     }
-    addToCar = false;
+    _addToCar = false;
     
-    while (readerMacroDepth[depth] > 0) {
-        --readerMacroDepth[depth];
-        ParserDebug(@"  closeListCell: --RMD[%d] = %d", depth, readerMacroDepth[depth]);
+    while (_readerMacroDepth[_depth] > 0) {
+        --_readerMacroDepth[_depth];
+        ParserDebug(@"  closeListCell: --RMD[%d] = %d", _depth, _readerMacroDepth[_depth]);
         [self closeList];
     }
 }
 
 - (void) closeList{
-    ParserDebug(@"closeList: depth = %d", depth);
+    ParserDebug(@"closeList: depth = %d", _depth);
     
     [self closeListCell];
 }
 
 -(void) openReaderMacro:(NSString*) operator{
-    [readerMacroStack addObject:operator];
+    [_readerMacroStack addObject:operator];
 }
 
 -(void) quoteNextElement{
@@ -9230,38 +9230,38 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
 -(id) parse:(NSString*)string{
     if (!string) return [NSNull null];            // don't crash, at least.
     
-    column = 0;
-    if (state != PARSE_REGEX)
-        [partial setString:@""];
+    _column = 0;
+    if (_state != PARSE_REGEX)
+        [_partial setString:@""];
     else
-        [partial autorelease];
+        [_partial autorelease];
     
     NSUInteger i = 0;
     NSUInteger imax = [string length];
     for (i = 0; i < imax; i++) {
-        column++;
+        _column++;
         unichar stri = [string characterAtIndex:i];
-        switch (state) {
+        switch (_state) {
             case PARSE_NORMAL:
                 switch(stri) {
                     case '(':
-                        ParserDebug(@"Parser: (  %d on line %d", column, linenum);
-                        [opens push:[NSNumber numberWithInt:column]];
-                        parens++;
-                        if ([partial length] == 0) {
+                        ParserDebug(@"Parser: (  %d on line %d", _column, _linenum);
+                        [_opens push:[NSNumber numberWithInt:_column]];
+                        _parens++;
+                        if ([_partial length] == 0) {
                             [self openList];
                         }
                         break;
                     case ')':
-                        ParserDebug(@"Parser: )  %d on line %d", column, linenum);
-                        [opens pop];
-                        parens--;
-                        if (parens < 0) parens = 0;
-                        if ([partial length] > 0) {
-                            [self addAtom:atomWithString(partial, symbolTable)];
-                            [partial setString:@""];
+                        ParserDebug(@"Parser: )  %d on line %d", _column, _linenum);
+                        [_opens pop];
+                        _parens--;
+                        if (_parens < 0) _parens = 0;
+                        if ([_partial length] > 0) {
+                            [self addAtom:atomWithString(_partial, _symbolTable)];
+                            [_partial setString:@""];
                         }
-                        if (depth > 0) {
+                        if (_depth > 0) {
                             [self closeList];
                         }
                         else {
@@ -9270,22 +9270,22 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                         break;
                     case '"':
                     {
-                        state = PARSE_STRING;
-                        parseEscapes = YES;
-                        [partial setString:@""];
+                        _state = PARSE_STRING;
+                        _parseEscapes = YES;
+                        [_partial setString:@""];
                         break;
                     }
                     case '-':
                     case '+':
                     {
                         if ((i+1 < imax) && ([string characterAtIndex:i+1] == '"')) {
-                            state = PARSE_STRING;
-                            parseEscapes = (stri == '+');
-                            [partial setString:@""];
+                            _state = PARSE_STRING;
+                            _parseEscapes = (stri == '+');
+                            [_partial setString:@""];
                             i++;
                         }
                         else {
-                            [partial appendCharacter:stri];
+                            [_partial appendCharacter:stri];
                         }
                         break;
                     }
@@ -9294,23 +9294,23 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                         if (i+1 < imax) {
                             unichar nextc = [string characterAtIndex:i+1];
                             if (nextc == ' ') {
-                                [partial appendCharacter:stri];
+                                [_partial appendCharacter:stri];
                             }
                             else {
-                                state = PARSE_REGEX;
-                                [partial setString:@""];
-                                [partial appendCharacter:'/'];
+                                _state = PARSE_REGEX;
+                                [_partial setString:@""];
+                                [_partial appendCharacter:'/'];
                             }
                         }
                         else {
-                            [partial appendCharacter:stri];
+                            [_partial appendCharacter:stri];
                         }
                         break;
                     }
                     case ':':
-                        [partial appendCharacter:':'];
-                        [self addAtom:atomWithString(partial, symbolTable)];
-                        [partial setString:@""];
+                        [_partial appendCharacter:':'];
+                        [self addAtom:atomWithString(_partial, _symbolTable)];
+                        [_partial setString:@""];
                         break;
                     case '\'':
                     {
@@ -9342,11 +9342,11 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                             }
                             else {
                                 // look for an escaped character
-                                NSUInteger newi = nu_parse_escape_sequences(string, i+1, imax, partial);
-                                if ([partial length] > 0) {
+                                NSUInteger newi = nu_parse_escape_sequences(string, i+1, imax, _partial);
+                                if ([_partial length] > 0) {
                                     isACharacterLiteral = true;
-                                    characterLiteralValue = [partial characterAtIndex:0];
-                                    [partial setString:@""];
+                                    characterLiteralValue = [_partial characterAtIndex:0];
+                                    [_partial setString:@""];
                                     i = newi;
                                     // make sure that we have a closing single-quote
                                     if ((i + 1 < imax) && ([string characterAtIndex:i+1] == '\'')) {
@@ -9383,88 +9383,88 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                         break;
                     }
                     case '\n':                    // end of line
-                        column = 0;
-                        linenum++;
+                        _column = 0;
+                        _linenum++;
                     case ' ':                     // end of token
                     case '\t':
                     case 0:                       // end of string
-                        if ([partial length] > 0) {
-                            [self addAtom:atomWithString(partial, symbolTable)];
-                            [partial setString:@""];
+                        if ([_partial length] > 0) {
+                            [self addAtom:atomWithString(_partial, _symbolTable)];
+                            [_partial setString:@""];
                         }
                         break;
                     case ';':
                     case '#':
-                        if ((stri == '#') && ([partial length] > 0)) {
+                        if ((stri == '#') && ([_partial length] > 0)) {
                             // this allows us to include '#' in symbols (but not as the first character)
-                            [partial appendCharacter:'#'];
+                            [_partial appendCharacter:'#'];
                         } else {
-                            if ([partial length]) {
-                                NuSymbol *symbol = [symbolTable symbolWithString:partial];
+                            if ([_partial length]) {
+                                NuSymbol *symbol = [_symbolTable symbolWithString:_partial];
                                 [self addAtom:symbol];
-                                [partial setString:@""];                        
+                                [_partial setString:@""];                        
                             }
-                            state = PARSE_COMMENT;
+                            _state = PARSE_COMMENT;
                         }
                         break;
                     case '<':
                         if ((i+3 < imax) && ([string characterAtIndex:i+1] == '<')
                             && (([string characterAtIndex:i+2] == '-') || ([string characterAtIndex:i+2] == '+'))) {
                             // parse a here string
-                            state = PARSE_HERESTRING;
-                            parseEscapes = ([string characterAtIndex:i+2] == '+');
+                            _state = PARSE_HERESTRING;
+                            _parseEscapes = ([string characterAtIndex:i+2] == '+');
                             // get the tag to match
                             NSUInteger j = i+3;
                             while ((j < imax) && ([string characterAtIndex:j] != '\n')) {
                                 j++;
                             }
-                            [pattern release];
-                            pattern = [[string substringWithRange:NSMakeRange(i+3, j-(i+3))] retain];
+                            [_pattern release];
+                            _pattern = [[string substringWithRange:NSMakeRange(i+3, j-(i+3))] retain];
                             //NSLog(@"herestring pattern: %@", pattern);
-                            [partial setString:@""];
+                            [_partial setString:@""];
                             // skip the newline
                             i = j;
                             //NSLog(@"parsing herestring that ends with %@ from %@", pattern, [string substringFromIndex:i]);
-                            hereString = nil;
-                            hereStringOpened = true;
+                            _hereString = nil;
+                            _hereStringOpened = true;
                             break;
                         }
                         // if this is not a here string, fall through to the general handler
                     default:
-                        [partial appendCharacter:stri];
+                        [_partial appendCharacter:stri];
                 }
                 break;
             case PARSE_HERESTRING:
                 //NSLog(@"pattern %@", pattern);
-                if ((stri == [pattern characterAtIndex:0]) &&
-                    (i + [pattern length] < imax) &&
-                    ([pattern isEqual:[string substringWithRange:NSMakeRange(i, [pattern length])]])) {
+                if ((stri == [_pattern characterAtIndex:0]) &&
+                    (i + [_pattern length] < imax) &&
+                    ([_pattern isEqual:[string substringWithRange:NSMakeRange(i, [_pattern length])]])) {
                     // everything up to here is the string
-                    NSString *string = [[[NSString alloc] initWithString:partial] autorelease];
-                    [partial setString:@""];
-                    if (!hereString)
-                        hereString = [[[NSMutableString alloc] init] autorelease];
+                    NSString *string = [[[NSString alloc] initWithString:_partial] autorelease];
+                    [_partial setString:@""];
+                    if (!_hereString)
+                        _hereString = [[[NSMutableString alloc] init] autorelease];
                     else
-                        [hereString appendString:@"\n"];
-                    [hereString appendString:string];
-                    if (hereString == nil)
-                        hereString = [NSMutableString string];
+                        [_hereString appendString:@"\n"];
+                    [_hereString appendString:string];
+                    if (_hereString == nil)
+                        _hereString = [NSMutableString string];
                     //NSLog(@"got herestring **%@**", hereString);
-                    [self addAtom:hereString];
+                    [self addAtom:_hereString];
                     // to continue, set i to point to the next character after the tag
-                    i = i + [pattern length] - 1;
+                    i = i + [_pattern length] - 1;
                     //NSLog(@"continuing parsing with:%s", &str[i+1]);
                     //NSLog(@"ok------------");
-                    state = PARSE_NORMAL;
-                    start = -1;
+                    _state = PARSE_NORMAL;
+                    _start = -1;
                 }
                 else {
-                    if (parseEscapes && (stri == '\\')) {
+                    if (_parseEscapes && (stri == '\\')) {
                         // parse escape sequencs in here strings
-                        i = nu_parse_escape_sequences(string, i, imax, partial);
+                        i = nu_parse_escape_sequences(string, i, imax, _partial);
                     }
                     else {
-                        [partial appendCharacter:stri];
+                        [_partial appendCharacter:stri];
                     }
                 }
                 break;
@@ -9472,35 +9472,35 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                 switch(stri) {
                     case '"':
                     {
-                        state = PARSE_NORMAL;
-                        NSString *string = [NSString stringWithString:partial];
+                        _state = PARSE_NORMAL;
+                        NSString *string = [NSString stringWithString:_partial];
                         //NSLog(@"parsed string:%@:", string);
                         [self addAtom:string];
-                        [partial setString:@""];
+                        [_partial setString:@""];
                         break;
                     }
                     case '\n':
                     {
-                        column = 0;
-                        linenum++;
-                        NSString *string = [[NSString alloc] initWithString:partial];
+                        _column = 0;
+                        _linenum++;
+                        NSString *string = [[NSString alloc] initWithString:_partial];
                         [NSException raise:@"NuParseError" format:@"partial string (terminated by newline): %@", string];
-                        [partial setString:@""];
+                        [_partial setString:@""];
                         break;
                     }
                     case '\\':
                     {                             // parse escape sequences in strings
-                        if (parseEscapes) {
-                            i = nu_parse_escape_sequences(string, i, imax, partial);
+                        if (_parseEscapes) {
+                            i = nu_parse_escape_sequences(string, i, imax, _partial);
                         }
                         else {
-                            [partial appendCharacter:stri];
+                            [_partial appendCharacter:stri];
                         }
                         break;
                     }
                     default:
                     {
-                        [partial appendCharacter:stri];
+                        [_partial appendCharacter:stri];
                     }
                 }
                 break;
@@ -9508,13 +9508,13 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                 switch(stri) {
                     case '/':                     // that's the end of it
                     {
-                        [partial appendCharacter:'/'];
+                        [_partial appendCharacter:'/'];
                         i++;
                         // add any remaining option characters
                         while (i < imax) {
                             unichar nextc = [string characterAtIndex:i];
                             if ((nextc >= 'a') && (nextc <= 'z')) {
-                                [partial appendCharacter:nextc];
+                                [_partial appendCharacter:nextc];
                                 i++;
                             }
                             else {
@@ -9522,21 +9522,21 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                                 break;
                             }
                         }
-                        [self addAtom:regexWithString(partial)];
-                        [partial setString:@""];
-                        state = PARSE_NORMAL;
+                        [self addAtom:regexWithString(_partial)];
+                        [_partial setString:@""];
+                        _state = PARSE_NORMAL;
                         break;
                     }
                     case '\\':
                     {
-                        [partial appendCharacter:stri];
+                        [_partial appendCharacter:stri];
                         i++;
-                        [partial appendCharacter:[string characterAtIndex:i]];
+                        [_partial appendCharacter:[string characterAtIndex:i]];
                         break;
                     }
                     default:
                     {
-                        [partial appendCharacter:stri];
+                        [_partial appendCharacter:stri];
                     }
                 }
                 break;
@@ -9544,66 +9544,66 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                 switch(stri) {
                     case '\n':
                     {
-                        if (!comments) comments = [[NSMutableString alloc] init];
-                        else [comments appendString:@"\n"];
-                        [comments appendString:[[[NSString alloc] initWithString:partial] autorelease]];
-                        [partial setString:@""];
-                        column = 0;
-                        linenum++;
-                        state = PARSE_NORMAL;
+                        if (!_comments) _comments = [[NSMutableString alloc] init];
+                        else [_comments appendString:@"\n"];
+                        [_comments appendString:[[[NSString alloc] initWithString:_partial] autorelease]];
+                        [_partial setString:@""];
+                        _column = 0;
+                        _linenum++;
+                        _state = PARSE_NORMAL;
                         break;
                     }
                     default:
                     {
-                        [partial appendCharacter:stri];
+                        [_partial appendCharacter:stri];
                     }
                 }
         }
     }
     // close off anything that is still being scanned.
-    if (state == PARSE_NORMAL) {
-        if ([partial length] > 0) {
-            [self addAtom:atomWithString(partial, symbolTable)];
+    if (_state == PARSE_NORMAL) {
+        if ([_partial length] > 0) {
+            [self addAtom:atomWithString(_partial, _symbolTable)];
         }
-        [partial setString:@""];
+        [_partial setString:@""];
     }
-    else if (state == PARSE_COMMENT) {
-        if (!comments) comments = [[NSMutableString alloc] init];
-        [comments appendString:[[[NSString alloc] initWithString:partial] autorelease]];
-        [partial setString:@""];
-        column = 0;
-        linenum++;
-        state = PARSE_NORMAL;
+    else if (_state == PARSE_COMMENT) {
+        if (!_comments) _comments = [[NSMutableString alloc] init];
+        [_comments appendString:[[[NSString alloc] initWithString:_partial] autorelease]];
+        [_partial setString:@""];
+        _column = 0;
+        _linenum++;
+        _state = PARSE_NORMAL;
     }
-    else if (state == PARSE_STRING) {
-        [NSException raise:@"NuParseError" format:@"partial string (terminated by newline): %@", partial];
+    else if (_state == PARSE_STRING) {
+        [NSException raise:@"NuParseError" format:@"partial string (terminated by newline): %@", _partial];
     }
-    else if (state == PARSE_HERESTRING) {
-        if (hereStringOpened) {
-            hereStringOpened = false;
+    else if (_state == PARSE_HERESTRING) {
+        if (_hereStringOpened) {
+            _hereStringOpened = false;
         }
         else {
-            if (hereString) {
-                [hereString appendString:@"\n"];
+            if (_hereString) {
+                [_hereString appendString:@"\n"];
             }
             else {
-                hereString = [[NSMutableString alloc] init];
+                _hereString = [[NSMutableString alloc] init];
             }
-            [hereString appendString:partial];
-            [partial setString:@""];
+            [_hereString appendString:_partial];
+            [_partial setString:@""];
         }
     }
-    else if (state == PARSE_REGEX) {
+    else if (_state == PARSE_REGEX) {
         // we stay in this state and leave the regex open.
-        [partial appendCharacter:'\n'];
-        [partial retain];
+        [_partial appendCharacter:'\n'];
+        [_partial retain];
     }
     if ([self incomplete]) {
         return [NSNull null];
     }
     else {
-        NuCell *expressions = root;
-        root = nil;
+        NuCell *expressions = _root;
+        _root = nil;
         [self reset];
         [expressions autorelease];
         return expressions;
@@ -9618,11 +9618,11 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
 }
 
 - (void) newline{
-    linenum++;
+    _linenum++;
 }
 
 - (id) eval: (id) code{
-    return [code evalWithContext:context];
+    return [code evalWithContext:_context];
 }
 
 - (id) valueForKey:(NSString *)string{
@@ -9630,13 +9630,13 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
 }
 
 - (void) setValue:(id)value forKey:(NSString *)string{
-    [context setObject:value forKey:[symbolTable symbolWithString:string]];
+    [_context setObject:value forKey:[_symbolTable symbolWithString:string]];
 }
 
 - (NSString *) parseEval:(NSString *)string{
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NuCell *expressions = [self parse:string];
-    id result = [[expressions evalWithContext:context] stringValue];
+    id result = [[expressions evalWithContext:_context] stringValue];
     [result retain];
     [pool drain];
     [result autorelease];
@@ -9709,7 +9709,7 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                         
                         @try
                         {
-                            id result = [expression evalWithContext:context];
+                            id result = [expression evalWithContext:_context];
                             if (result) {
                                 id stringToDisplay;
                                 if ([result respondsToSelector:@selector(escapedStringRepresentation)]) {
