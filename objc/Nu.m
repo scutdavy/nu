@@ -10383,7 +10383,7 @@ static void nu_swizzleContainerClasses(){
      setValue:[NuBridgedFunction functionWithName:@"NSLog" signature:@"v@"]];
 }
 
-- (NSMutableDictionary *) symbol_table{
+- (NSMutableDictionary *) symbolTable{
     if (_symbolTable == nil) {
         _symbolTable = [NSMutableDictionary dictionary];
     }
@@ -10399,7 +10399,7 @@ static void nu_swizzleContainerClasses(){
 - (NuSymbol *) symbolWithString:(NSString *)string{
     // If the symbol is already in the table, return it.
     NuSymbol *symbol;
-    symbol = [self.symbol_table objectForKey:string];
+    symbol = [self.symbolTable objectForKey:string];
     if (symbol) return symbol;
     
     // If not, create it.
@@ -10412,20 +10412,20 @@ static void nu_swizzleContainerClasses(){
     symbol->_isGensym = (len > 2) && (cstring[0] == '_') && (cstring[1] == '_');
     
     // Put the new symbol in the symbol table and return it.
-    [self.symbol_table setObject:symbol forKey:string];
+    [self.symbolTable setObject:symbol forKey:string];
     return symbol;
 }
 
 - (NuSymbol *) lookup:(NSString *) string{
-    return [self.symbol_table objectForKey:string];
+    return [self.symbolTable objectForKey:string];
 }
 
 - (NSArray *) all{
-    return [self.symbol_table allValues];
+    return [self.symbolTable allValues];
 }
 
 - (void) removeSymbol:(NuSymbol *) symbol{
-    [self.symbol_table removeObjectForKey:[symbol stringValue]];
+    [self.symbolTable removeObjectForKey:[symbol stringValue]];
 }
 
 @end
