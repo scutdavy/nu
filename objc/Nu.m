@@ -8993,12 +8993,12 @@ static id regexWithString(NSString *string){
     // when we have two consecutive labels, concatenate them.
     // this allows us to have ':' characters inside labels.
     if ([atom isKindOfClass:[NuSymbol class]] && [atom isLabel]) {	
-	id currentCar = [_current car];
-	if ([currentCar isKindOfClass:[NuSymbol class]] && [currentCar isLabel]) {
-		NuSymbol *combinedLabel = [_symbolTable symbolWithString:[[currentCar stringValue] stringByAppendingString:[atom stringValue]]];
-		[_current setCar:combinedLabel];
-		return;
-	}		
+        id currentCar = [_current car];
+        if ([currentCar isKindOfClass:[NuSymbol class]] && [currentCar isLabel]) {
+            NuSymbol *combinedLabel = [_symbolTable symbolWithString:[[currentCar stringValue] stringByAppendingString:[atom stringValue]]];
+            [_current setCar:combinedLabel];
+            return;
+        }		
     }
 
     NuCell *newCell;
