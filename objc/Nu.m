@@ -8674,7 +8674,6 @@ static id regexWithString(NSString *string){
 	int _readerMacroDepth[NU_MAX_PARSER_MACRO_DEPTH];
 }
 
-@property (nonatomic) int column;
 @property (nonatomic) int filenum;
 @property (nonatomic) int linenum;
 
@@ -8781,7 +8780,6 @@ static id regexWithString(NSString *string){
     if ((self = [super init])) {
         _filenum = -1;
         _linenum = 1;
-        _column = 0;
         _opens = [[NuStack alloc] init];
         // attach to symbol table (or create one if we want a separate table per parser)
         _symbolTable = [[NuSymbolTable sharedSymbolTable] retain];
@@ -9063,7 +9061,7 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
 -(id) parse:(NSString*)string{
     if (!string) return [NSNull null];            // don't crash, at least.
     
-    _column = 0;
+    int column = 0;
     if (_state != NUPaserStateRegex)
         [_partial setString:@""];
     else
@@ -9072,14 +9070,14 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
     NSUInteger i = 0;
     NSUInteger imax = [string length];
     for (i = 0; i < imax; i++) {
-        _column++;
+        column++;
         unichar stri = [string characterAtIndex:i];
         switch (_state) {
             case NUPaserStateNormal:
                 switch(stri) {
                     case '(':
                         ParserDebug(@"Parser: (  %d on line %d", _column, _linenum);
-                        [_opens push:@(_column)];
+                        [_opens push:@(column)];
                         if ([_partial length] == 0) {
                             [self openList];
                         }
@@ -9213,7 +9211,7 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                         break;
                     }
                     case '\n':                    // end of line
-                        _column = 0;
+                        column = 0;
                         _linenum++;
                     case ' ':                     // end of token
                     case '\t':
@@ -9310,7 +9308,7 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                     }
                     case '\n':
                     {
-                        _column = 0;
+                        column = 0;
                         _linenum++;
                         NSString *string = [[NSString alloc] initWithString:_partial];
                         [NSException raise:@"NuParseError" format:@"partial string (terminated by newline): %@", string];
@@ -9377,7 +9375,7 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                         else [_comments appendString:@"\n"];
                         [_comments appendString:[[[NSString alloc] initWithString:_partial] autorelease]];
                         [_partial setString:@""];
-                        _column = 0;
+                        column = 0;
                         _linenum++;
                         _state = NUPaserStateNormal;
                         break;
@@ -9400,7 +9398,7 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
         if (!_comments) _comments = [[NSMutableString alloc] init];
         [_comments appendString:[[[NSString alloc] initWithString:_partial] autorelease]];
         [_partial setString:@""];
-        _column = 0;
+        column = 0;
         _linenum++;
         _state = NUPaserStateNormal;
     }
