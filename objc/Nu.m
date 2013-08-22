@@ -10376,11 +10376,11 @@ static void nu_swizzleContainerClasses(){
 
 void load_builtins(NuSymbolTable *);
 
-static NuSymbolTable *sharedSymbolTable = 0;
 
 @implementation NuSymbolTable
 
 + (NuSymbolTable *) sharedSymbolTable{
+    static NuSymbolTable *sharedSymbolTable = 0;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedSymbolTable = [[self alloc] init];
