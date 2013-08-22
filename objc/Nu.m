@@ -8726,11 +8726,13 @@ void load_builtins(NuSymbolTable *symbolTable){
 
 #pragma mark - NuParser.m
 
-#define PARSE_NORMAL     0
-#define PARSE_COMMENT    1
-#define PARSE_STRING     2
-#define PARSE_HERESTRING 3
-#define PARSE_REGEX      4
+typedef NS_ENUM(NSInteger, NUPaserState) {
+    NUPaserStateNormal,
+    NUPaserStateComment,
+    NUPaserStateString,
+    NUPaserStateHereString,
+    NUPaserStateRegex,
+};
 
 #define MAX_FILES 1024
 static char *g_filenames[MAX_FILES];
@@ -8808,7 +8810,7 @@ static id regexWithString(NSString *string){
 #define NU_MAX_PARSER_MACRO_DEPTH 1000
 
 @interface NuParser (){
-    int _state;
+    NUPaserState _state;
     int _start;
     int _depth;
     int _parens;
@@ -8837,7 +8839,7 @@ static id regexWithString(NSString *string){
 
 - (int) depth;
 - (int) parens;
-- (int) state;
+- (NUPaserState) state;
 - (NuCell *) root;
 - (NuStack *) opens;
 - (NSString *) stringValue;
@@ -8881,7 +8883,7 @@ static id regexWithString(NSString *string){
 }
 
 - (BOOL) incomplete{
-    return (_depth > 0) || (_state == PARSE_REGEX) || (_state == PARSE_HERESTRING);
+    return (_depth > 0) || (_state == NUPaserStateRegex) || (_state == NUPaserStateHereString);
 }
 
 - (int) depth{
@@ -8921,7 +8923,7 @@ static id regexWithString(NSString *string){
 }
 
 - (void) reset{
-    _state = PARSE_NORMAL;
+    _state = NUPaserStateNormal;
     [_partial setString:@""];
     _depth = 0;
     _parens = 0;
@@ -9231,7 +9233,7 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
     if (!string) return [NSNull null];            // don't crash, at least.
     
     _column = 0;
-    if (_state != PARSE_REGEX)
+    if (_state != NUPaserStateRegex)
         [_partial setString:@""];
     else
         [_partial autorelease];
@@ -9242,7 +9244,7 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
         _column++;
         unichar stri = [string characterAtIndex:i];
         switch (_state) {
-            case PARSE_NORMAL:
+            case NUPaserStateNormal:
                 switch(stri) {
                     case '(':
                         ParserDebug(@"Parser: (  %d on line %d", _column, _linenum);
@@ -9270,7 +9272,7 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                         break;
                     case '"':
                     {
-                        _state = PARSE_STRING;
+                        _state = NUPaserStateString;
                         _parseEscapes = YES;
                         [_partial setString:@""];
                         break;
@@ -9279,7 +9281,7 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                     case '+':
                     {
                         if ((i+1 < imax) && ([string characterAtIndex:i+1] == '"')) {
-                            _state = PARSE_STRING;
+                            _state = NUPaserStateString;
                             _parseEscapes = (stri == '+');
                             [_partial setString:@""];
                             i++;
@@ -9297,7 +9299,7 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                                 [_partial appendCharacter:stri];
                             }
                             else {
-                                _state = PARSE_REGEX;
+                                _state = NUPaserStateRegex;
                                 [_partial setString:@""];
                                 [_partial appendCharacter:'/'];
                             }
@@ -9404,14 +9406,14 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                                 [self addAtom:symbol];
                                 [_partial setString:@""];                        
                             }
-                            _state = PARSE_COMMENT;
+                            _state = NUPaserStateComment;
                         }
                         break;
                     case '<':
                         if ((i+3 < imax) && ([string characterAtIndex:i+1] == '<')
                             && (([string characterAtIndex:i+2] == '-') || ([string characterAtIndex:i+2] == '+'))) {
                             // parse a here string
-                            _state = PARSE_HERESTRING;
+                            _state = NUPaserStateHereString;
                             _parseEscapes = ([string characterAtIndex:i+2] == '+');
                             // get the tag to match
                             NSUInteger j = i+3;
@@ -9434,7 +9436,7 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                         [_partial appendCharacter:stri];
                 }
                 break;
-            case PARSE_HERESTRING:
+            case NUPaserStateHereString:
                 //NSLog(@"pattern %@", pattern);
                 if ((stri == [_pattern characterAtIndex:0]) &&
                     (i + [_pattern length] < imax) &&
@@ -9455,7 +9457,7 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                     i = i + [_pattern length] - 1;
                     //NSLog(@"continuing parsing with:%s", &str[i+1]);
                     //NSLog(@"ok------------");
-                    _state = PARSE_NORMAL;
+                    _state = NUPaserStateNormal;
                     _start = -1;
                 }
                 else {
@@ -9468,11 +9470,11 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                     }
                 }
                 break;
-            case PARSE_STRING:
+            case NUPaserStateString:
                 switch(stri) {
                     case '"':
                     {
-                        _state = PARSE_NORMAL;
+                        _state = NUPaserStateNormal;
                         NSString *string = [NSString stringWithString:_partial];
                         //NSLog(@"parsed string:%@:", string);
                         [self addAtom:string];
@@ -9504,7 +9506,7 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                     }
                 }
                 break;
-            case PARSE_REGEX:
+            case NUPaserStateRegex:
                 switch(stri) {
                     case '/':                     // that's the end of it
                     {
@@ -9524,7 +9526,7 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                         }
                         [self addAtom:regexWithString(_partial)];
                         [_partial setString:@""];
-                        _state = PARSE_NORMAL;
+                        _state = NUPaserStateNormal;
                         break;
                     }
                     case '\\':
@@ -9540,7 +9542,7 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                     }
                 }
                 break;
-            case PARSE_COMMENT:
+            case NUPaserStateComment:
                 switch(stri) {
                     case '\n':
                     {
@@ -9550,7 +9552,7 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
                         [_partial setString:@""];
                         _column = 0;
                         _linenum++;
-                        _state = PARSE_NORMAL;
+                        _state = NUPaserStateNormal;
                         break;
                     }
                     default:
@@ -9561,24 +9563,24 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
         }
     }
     // close off anything that is still being scanned.
-    if (_state == PARSE_NORMAL) {
+    if (_state == NUPaserStateNormal) {
         if ([_partial length] > 0) {
             [self addAtom:atomWithString(_partial, _symbolTable)];
         }
         [_partial setString:@""];
     }
-    else if (_state == PARSE_COMMENT) {
+    else if (_state == NUPaserStateComment) {
         if (!_comments) _comments = [[NSMutableString alloc] init];
         [_comments appendString:[[[NSString alloc] initWithString:_partial] autorelease]];
         [_partial setString:@""];
         _column = 0;
         _linenum++;
-        _state = PARSE_NORMAL;
+        _state = NUPaserStateNormal;
     }
-    else if (_state == PARSE_STRING) {
+    else if (_state == NUPaserStateString) {
         [NSException raise:@"NuParseError" format:@"partial string (terminated by newline): %@", _partial];
     }
-    else if (_state == PARSE_HERESTRING) {
+    else if (_state == NUPaserStateHereString) {
         if (_hereStringOpened) {
             _hereStringOpened = false;
         }
@@ -9593,7 +9595,7 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
             [_partial setString:@""];
         }
     }
-    else if (_state == PARSE_REGEX) {
+    else if (_state == NUPaserStateRegex) {
         // we stay in this state and leave the regex open.
         [_partial appendCharacter:'\n'];
         [_partial retain];
