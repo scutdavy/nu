@@ -97,7 +97,7 @@ static size_t size_of_objc_type(const char *typeString);
 
 @implementation NSNull (nu_null)
 + (id) NU_null{
-    return [NSNull NU_null];
+    return [NSNull null];
 }
 @end
 #pragma mark - NuHandler.h
