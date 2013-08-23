@@ -8600,7 +8600,7 @@ static char *g_filenames[MAX_FILES];
 static int g_filecount = 0;
 
 // Turn debug output on and off for this file only
-//#define PARSER_DEBUG 1
+#define PARSER_DEBUG 1
 
 #ifdef PARSER_DEBUG
 #define ParserDebug(arg...) NSLog(arg)
@@ -9076,14 +9076,14 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
             case NUPaserStateNormal:
                 switch(stri) {
                     case '(':
-                        ParserDebug(@"Parser: (  %d on line %d", _column, _linenum);
+                        ParserDebug(@"Parser: (  %d on line %d", column, _linenum);
                         [_opens push:@(column)];
                         if ([_partial length] == 0) {
                             [self openList];
                         }
                         break;
                     case ')':
-                        ParserDebug(@"Parser: )  %d on line %d", _column, _linenum);
+                        ParserDebug(@"Parser: )  %d on line %d", column, _linenum);
                         [_opens pop];
                         if ([_partial length] > 0) {
                             [self addAtom:atomWithString(_partial, _symbolTable)];
