@@ -8224,40 +8224,6 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 
 @end
 
-@interface Nu_cmethod_operator : NuOperator
-@end
-
-@implementation Nu_cmethod_operator
-- (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    NSLog(@"The cmethod operator is deprecated. Please replace it with '+' in your code.");
-    NuSymbolTable *symbolTable = [context objectForKey:SYMBOLS_KEY];
-    NuClass *classWrapper = [context objectForKey:[symbolTable symbolWithString:@"_class"]];
-    [classWrapper registerClass];
-    Class classToExtend = [classWrapper wrappedClass];
-    if (!classToExtend)
-        [NSException raise:@"NuMisplacedDeclaration" format:@"class method declaration with no enclosing class declaration"];
-    return help_add_method_to_class(classToExtend, cdr, context, YES);
-}
-
-@end
-
-@interface Nu_imethod_operator : NuOperator
-@end
-
-@implementation Nu_imethod_operator
-- (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    NSLog(@"The imethod operator is deprecated. Please replace it with '-' in your code.");
-    NuSymbolTable *symbolTable = [context objectForKey:SYMBOLS_KEY];
-    NuClass *classWrapper = [context objectForKey:[symbolTable symbolWithString:@"_class"]];
-    [classWrapper registerClass];
-    Class classToExtend = [classWrapper wrappedClass];
-    if (!classToExtend)
-        [NSException raise:@"NuMisplacedDeclaration" format:@"instance method declaration with no enclosing class declaration"];
-    return help_add_method_to_class(classToExtend, cdr, context, NO);
-}
-
-@end
-
 @interface Nu_ivar_operator : NuOperator
 @end
 
@@ -8284,28 +8250,6 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
                                                    [signature cStringUsingEncoding:NSUTF8StringEncoding]);
         //NSLog(@"adding ivar %@ with signature %@", [variableName stringValue], signature);
     }
-    return [NSNull NU_null];
-}
-
-@end
-
-@interface Nu_ivars_operator : NuOperator
-@end
-
-@implementation Nu_ivars_operator
-- (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    NSLog(@"The ivars operator is unnecessary. Please remove it from your source.");
-    return [NSNull NU_null];
-}
-
-@end
-
-@interface Nu_ivar_accessors_operator : NuOperator
-@end
-
-@implementation Nu_ivar_accessors_operator
-- (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    NSLog(@"The ivar-accessors operator is unnecessary. Please remove it from your source.");
     return [NSNull NU_null];
 }
 
@@ -10329,11 +10273,7 @@ static void nu_swizzleContainerClasses(){
     install(@"sleep",    Nu_sleep_operator);
     
     install(@"class",    Nu_class_operator);
-    install(@"imethod",  Nu_imethod_operator);
-    install(@"cmethod",  Nu_cmethod_operator);
     install(@"ivar",     Nu_ivar_operator);
-    install(@"ivars",    Nu_ivars_operator);
-    install(@"ivar-accessors", Nu_ivar_accessors_operator);
     
     install(@"call",     Nu_call_operator);
     install(@"send",     Nu_send_operator);
