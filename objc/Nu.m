@@ -499,44 +499,47 @@ id _nulist(id firstObject, ...){
 
 + (BOOL) loadNuFile:(NSString *) fileName fromBundleWithIdentifier:(NSString *) bundleIdentifier withContext:(NSMutableDictionary *) context{
     BOOL success = NO;
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    NSBundle *bundle = [NSBundle bundleWithIdentifier:bundleIdentifier];
-    NSString *filePath = [bundle pathForResource:fileName ofType:@"nu"];
-    if (filePath) {
-        NSString *fileNu = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
-        if (fileNu) {
-            NuParser *parser = [Nu sharedParser];
-            id script = [parser parse:fileNu asIfFromFilename:[filePath cStringUsingEncoding:NSUTF8StringEncoding]];
-            if (!context) context = [parser context];
-            [script evalWithContext:context];
-            success = YES;
-        }
-    }
-    else {
-        if ([bundleIdentifier isEqual:@"nu.programming.framework"]) {
-            // try to read it if it's baked in
-            
-            @try
-            {
-                id baked_function = [NuBridgedFunction functionWithName:[NSString stringWithFormat:@"baked_%@", fileName] signature:@"@"];
-                id baked_code = [baked_function evalWithArguments:nil context:nil];
-                if (!context) {
-                    NuParser *parser = [Nu parser];
-                    context = [parser context];
-                }
-                [baked_code evalWithContext:context];
+    
+    @autoreleasepool {
+        
+        NSBundle *bundle = [NSBundle bundleWithIdentifier:bundleIdentifier];
+        NSString *filePath = [bundle pathForResource:fileName ofType:@"nu"];
+        if (filePath) {
+            NSString *fileNu = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:nil];
+            if (fileNu) {
+                NuParser *parser = [Nu sharedParser];
+                id script = [parser parse:fileNu asIfFromFilename:[filePath cStringUsingEncoding:NSUTF8StringEncoding]];
+                if (!context) context = [parser context];
+                [script evalWithContext:context];
                 success = YES;
-            }
-            @catch (id exception)
-            {
-                success = NO;
             }
         }
         else {
-            success = NO;
+            if ([bundleIdentifier isEqual:@"nu.programming.framework"]) {
+                // try to read it if it's baked in
+                
+                @try
+                {
+                    id baked_function = [NuBridgedFunction functionWithName:[NSString stringWithFormat:@"baked_%@", fileName] signature:@"@"];
+                    id baked_code = [baked_function evalWithArguments:nil context:nil];
+                    if (!context) {
+                        NuParser *parser = [Nu parser];
+                        context = [parser context];
+                    }
+                    [baked_code evalWithContext:context];
+                    success = YES;
+                }
+                @catch (id exception)
+                {
+                    success = NO;
+                }
+            }
+            else {
+                success = NO;
+            }
         }
     }
-    [pool release];
+
     return success;
 }
 
@@ -1688,100 +1691,100 @@ static id nu_calling_objc_method_handler(id target, Method m, NSMutableArray *ar
     
     id result;
     // if we get here, we're going through the ObjC runtime to make the call.
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    
-    SEL s = method_getName(m);
-    result = [NSNull null];
-    
-    // dynamically construct the method call
-    
-    
-    int argument_count = method_getNumberOfArguments(m);
-    
-	if ( [args count] != argument_count-2) {
-		
-		raise_argc_exception(s, argument_count-2, [args count]);
-    }
-    else {
-        char return_type_buffer[BUFSIZE], arg_type_buffer[BUFSIZE];
-        method_getReturnType(m, return_type_buffer, BUFSIZE);
-        ffi_type *result_type = ffi_type_for_objc_type(&return_type_buffer[0]);
-        void *result_value = value_buffer_for_objc_type(&return_type_buffer[0]);
-        ffi_type **argument_types = (ffi_type **) malloc (argument_count * sizeof(ffi_type *));
-        void **argument_values = (void **) malloc (argument_count * sizeof(void *));
-        int *argument_needs_retained = (int *) malloc (argument_count * sizeof(int));
-        int i;
-        for (i = 0; i < argument_count; i++) {
+    @autoreleasepool {
+        SEL s = method_getName(m);
+        result = [NSNull null];
+        
+        // dynamically construct the method call
+        
+        
+        int argument_count = method_getNumberOfArguments(m);
+        
+        if ( [args count] != argument_count-2) {
             
-            method_getArgumentType(m, i, &arg_type_buffer[0], BUFSIZE);
-			
-			argument_types[i] = ffi_type_for_objc_type(&arg_type_buffer[0]);
-            argument_values[i] = value_buffer_for_objc_type(&arg_type_buffer[0]);
-            if (i == 0)
-                *((id *) argument_values[i]) = target;
-            else if (i == 1)
-                *((SEL *) argument_values[i]) = method_getName(m);
-            else
-                argument_needs_retained[i-2] = set_objc_value_from_nu_value(argument_values[i], [args objectAtIndex:(i-2)], &arg_type_buffer[0]);
-        }
-        ffi_cif cif2;
-        int status = ffi_prep_cif(&cif2, FFI_DEFAULT_ABI, (unsigned int) argument_count, result_type, argument_types);
-        if (status != FFI_OK) {
-            NSLog (@"failed to prepare cif structure");
+            raise_argc_exception(s, argument_count-2, [args count]);
         }
         else {
-            const char *method_name = sel_getName(method_getName(m));
-            BOOL callingInitializer = !strncmp("init", method_name, 4);
-            if (callingInitializer) {
-                [target retain]; // in case an init method releases its target (to return something else), we preemptively retain it
-            }
-            // call the method handler
-            ffi_call(&cif2, FFI_FN(imp), result_value, argument_values);
-            // extract the return value
-            result = get_nu_value_from_objc_value(result_value, &return_type_buffer[0]);
-            // NSLog(@"result is %@", result);
-            // NSLog(@"retain count %d", [result retainCount]);
-            
-            // Return values should not require a release.
-            // Either they are owned by an existing object or are autoreleased.
-            // Exceptions to this rule are handled below.
-            // Since these methods create new objects that aren't autoreleased, we autorelease them.
-            bool already_retained =               // see Anguish/Buck/Yacktman, p. 104
-            (s == @selector(alloc)) || (s == @selector(allocWithZone:))
-            || (s == @selector(copy)) || (s == @selector(copyWithZone:))
-            || (s == @selector(mutableCopy)) || (s == @selector(mutableCopyWithZone:))
-            || (s == @selector(new));
-            //NSLog(@"already retained? %d", already_retained);
-            if (already_retained) {
-                [result autorelease];
-            }
-            
-            if (callingInitializer) {
-                if (result == target) {
-                    // NSLog(@"undoing preemptive retain of init target %@", [target className]);
-                    [target release]; // undo our preemptive retain
-                } else {
-                    // NSLog(@"keeping preemptive retain of init target %@", [target className]);
-                }
-            }
-            
-            for (i = 0; i < [args count]; i++) {
-                if (argument_needs_retained[i])
-                    [[args objectAtIndex:i] retainReferencedObject];
-            }
-            
-            // free the value structures
+            char return_type_buffer[BUFSIZE], arg_type_buffer[BUFSIZE];
+            method_getReturnType(m, return_type_buffer, BUFSIZE);
+            ffi_type *result_type = ffi_type_for_objc_type(&return_type_buffer[0]);
+            void *result_value = value_buffer_for_objc_type(&return_type_buffer[0]);
+            ffi_type **argument_types = (ffi_type **) malloc (argument_count * sizeof(ffi_type *));
+            void **argument_values = (void **) malloc (argument_count * sizeof(void *));
+            int *argument_needs_retained = (int *) malloc (argument_count * sizeof(int));
+            int i;
             for (i = 0; i < argument_count; i++) {
-                free(argument_values[i]);
+                
+                method_getArgumentType(m, i, &arg_type_buffer[0], BUFSIZE);
+                
+                argument_types[i] = ffi_type_for_objc_type(&arg_type_buffer[0]);
+                argument_values[i] = value_buffer_for_objc_type(&arg_type_buffer[0]);
+                if (i == 0)
+                    *((id *) argument_values[i]) = target;
+                else if (i == 1)
+                    *((SEL *) argument_values[i]) = method_getName(m);
+                else
+                    argument_needs_retained[i-2] = set_objc_value_from_nu_value(argument_values[i], [args objectAtIndex:(i-2)], &arg_type_buffer[0]);
             }
-            free(argument_values);
-            free(result_value);
-            free(argument_types);
-            free(argument_needs_retained);
+            ffi_cif cif2;
+            int status = ffi_prep_cif(&cif2, FFI_DEFAULT_ABI, (unsigned int) argument_count, result_type, argument_types);
+            if (status != FFI_OK) {
+                NSLog (@"failed to prepare cif structure");
+            }
+            else {
+                const char *method_name = sel_getName(method_getName(m));
+                BOOL callingInitializer = !strncmp("init", method_name, 4);
+                if (callingInitializer) {
+                    [target retain]; // in case an init method releases its target (to return something else), we preemptively retain it
+                }
+                // call the method handler
+                ffi_call(&cif2, FFI_FN(imp), result_value, argument_values);
+                // extract the return value
+                result = get_nu_value_from_objc_value(result_value, &return_type_buffer[0]);
+                // NSLog(@"result is %@", result);
+                // NSLog(@"retain count %d", [result retainCount]);
+                
+                // Return values should not require a release.
+                // Either they are owned by an existing object or are autoreleased.
+                // Exceptions to this rule are handled below.
+                // Since these methods create new objects that aren't autoreleased, we autorelease them.
+                bool already_retained =               // see Anguish/Buck/Yacktman, p. 104
+                (s == @selector(alloc)) || (s == @selector(allocWithZone:))
+                || (s == @selector(copy)) || (s == @selector(copyWithZone:))
+                || (s == @selector(mutableCopy)) || (s == @selector(mutableCopyWithZone:))
+                || (s == @selector(new));
+                //NSLog(@"already retained? %d", already_retained);
+                if (already_retained) {
+                    [result autorelease];
+                }
+                
+                if (callingInitializer) {
+                    if (result == target) {
+                        // NSLog(@"undoing preemptive retain of init target %@", [target className]);
+                        [target release]; // undo our preemptive retain
+                    } else {
+                        // NSLog(@"keeping preemptive retain of init target %@", [target className]);
+                    }
+                }
+                
+                for (i = 0; i < [args count]; i++) {
+                    if (argument_needs_retained[i])
+                        [[args objectAtIndex:i] retainReferencedObject];
+                }
+                
+                // free the value structures
+                for (i = 0; i < argument_count; i++) {
+                    free(argument_values[i]);
+                }
+                free(argument_values);
+                free(result_value);
+                free(argument_types);
+                free(argument_needs_retained);
+            }
         }
+        [result retain];
     }
-    [result retain];
-    [pool drain];
+    
     [result autorelease];
     return result;
 }
@@ -1797,67 +1800,67 @@ static void objc_calling_nu_method_handler(ffi_cif* cif, void* returnvalue, void
     
     // in rare cases, we need an autorelease pool (specifically detachNewThreadSelector:toTarget:withObject:)
     // previously we used a private api to verify that one existed before creating a new one. Now we just make one.
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    
-    NuBlock *block = ((NuBlock **)userdata)[1];
-    //NSLog(@"----------------------------------------");
-    //NSLog(@"calling block %@", [block stringValue]);
-    id arguments = [[NuCell alloc] init];
-    id cursor = arguments;
-    int i;
-    for (i = 0; i < argc; i++) {
-        NuCell *nextCell = [[NuCell alloc] init];
-        [cursor setCdr:nextCell];
-        [nextCell release];
-        cursor = [cursor cdr];
-        id value = get_nu_value_from_objc_value(args[i+2], ((char **)userdata)[i+2]);
-        [cursor setCar:value];
-    }
-    id result = [block evalWithArguments:[arguments cdr] context:nil self:rcv];
-    //NSLog(@"in nu method handler, putting result %@ in %x with type %s", [result stringValue], (int) returnvalue, ((char **)userdata)[0]);
-    char *resultType = (((char **)userdata)[0])+1;// skip the first character, it's a flag
-    set_objc_value_from_nu_value(returnvalue, result, resultType);
+    char *resultType = NULL;
+    @autoreleasepool {
+        NuBlock *block = ((NuBlock **)userdata)[1];
+        //NSLog(@"----------------------------------------");
+        //NSLog(@"calling block %@", [block stringValue]);
+        id arguments = [[NuCell alloc] init];
+        id cursor = arguments;
+        int i;
+        for (i = 0; i < argc; i++) {
+            NuCell *nextCell = [[NuCell alloc] init];
+            [cursor setCdr:nextCell];
+            [nextCell release];
+            cursor = [cursor cdr];
+            id value = get_nu_value_from_objc_value(args[i+2], ((char **)userdata)[i+2]);
+            [cursor setCar:value];
+        }
+        id result = [block evalWithArguments:[arguments cdr] context:nil self:rcv];
+        //NSLog(@"in nu method handler, putting result %@ in %x with type %s", [result stringValue], (int) returnvalue, ((char **)userdata)[0]);
+        resultType = (((char **)userdata)[0])+1;// skip the first character, it's a flag
+        set_objc_value_from_nu_value(returnvalue, result, resultType);
 #ifdef __ppc__
-    // It appears that at least on PowerPC architectures, small values (short, char, ushort, uchar) passed in via
-    // the ObjC runtime use their actual type while function return values are coerced up to integers.
-    // I suppose this is because values are passed as arguments in memory and returned in registers.
-    // This may also be the case on x86 but is unobserved because x86 is little endian.
-    switch (resultType[0]) {
-        case 'C':
-        {
-            *((unsigned int *) returnvalue) = *((unsigned char *) returnvalue);
-            break;
+        // It appears that at least on PowerPC architectures, small values (short, char, ushort, uchar) passed in via
+        // the ObjC runtime use their actual type while function return values are coerced up to integers.
+        // I suppose this is because values are passed as arguments in memory and returned in registers.
+        // This may also be the case on x86 but is unobserved because x86 is little endian.
+        switch (resultType[0]) {
+            case 'C':
+            {
+                *((unsigned int *) returnvalue) = *((unsigned char *) returnvalue);
+                break;
+            }
+            case 'c':
+            {
+                *((int *) returnvalue) = *((char *) returnvalue);
+                break;
+            }
+            case 'S':
+            {
+                *((unsigned int *) returnvalue) = *((unsigned short *) returnvalue);
+                break;
+            }
+            case 's':
+            {
+                *((int *) returnvalue) = *((short *) returnvalue);
+                break;
+            }
         }
-        case 'c':
-        {
-            *((int *) returnvalue) = *((char *) returnvalue);
-            break;
-        }
-        case 'S':
-        {
-            *((unsigned int *) returnvalue) = *((unsigned short *) returnvalue);
-            break;
-        }
-        case 's':
-        {
-            *((int *) returnvalue) = *((short *) returnvalue);
-            break;
-        }
-    }
 #endif
-    
-    if (((char **)userdata)[0][0] == '!') {
-        //NSLog(@"retaining result for object %@, count = %d", *(id *)returnvalue, [*(id *)returnvalue retainCount]);
-        [*((id *)returnvalue) retain];
-    }
-    [arguments release];
-    if (pool) {
+        
+        if (((char **)userdata)[0][0] == '!') {
+            //NSLog(@"retaining result for object %@, count = %d", *(id *)returnvalue, [*(id *)returnvalue retainCount]);
+            [*((id *)returnvalue) retain];
+        }
+        [arguments release];
+        
         if (resultType[0] == '@')
             [*((id *)returnvalue) retain];
-        [pool drain];
-        if (resultType[0] == '@')
-            [*((id *)returnvalue) autorelease];
     }
+
+    if (resultType[0] == '@')
+        [*((id *)returnvalue) autorelease];
 }
 
 static char **generate_userdata(SEL sel, NuBlock *block, const char *signature){
@@ -2014,65 +2017,65 @@ static id add_method_to_class(Class c, NSString *methodName, NSString *signature
     //NSLog(@"----------------------------------------");
     //NSLog(@"calling C function %s with signature %s", name, signature);
     id result;
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
-    char *return_type_identifier = strdup(_signature);
-    nu_markEndOfObjCTypeString(return_type_identifier, strlen(return_type_identifier));
-    
-    int argument_count = 0;
-    char *argument_type_identifiers[100];
-    char *cursor = &_signature[strlen(return_type_identifier)];
-    while (*cursor != 0) {
-        argument_type_identifiers[argument_count] = strdup(cursor);
-        nu_markEndOfObjCTypeString(argument_type_identifiers[argument_count], strlen(cursor));
-        cursor = &cursor[strlen(argument_type_identifiers[argument_count])];
-        argument_count++;
+    @autoreleasepool {
+        char *return_type_identifier = strdup(_signature);
+        nu_markEndOfObjCTypeString(return_type_identifier, strlen(return_type_identifier));
+        
+        int argument_count = 0;
+        char *argument_type_identifiers[100];
+        char *cursor = &_signature[strlen(return_type_identifier)];
+        while (*cursor != 0) {
+            argument_type_identifiers[argument_count] = strdup(cursor);
+            nu_markEndOfObjCTypeString(argument_type_identifiers[argument_count], strlen(cursor));
+            cursor = &cursor[strlen(argument_type_identifiers[argument_count])];
+            argument_count++;
+        }
+        //NSLog(@"calling return type is %s", return_type_identifier);
+        int i;
+        for (i = 0; i < argument_count; i++) {
+            //    NSLog(@"argument %d type is %s", i, argument_type_identifiers[i]);
+        }
+        
+        ffi_cif *cif = (ffi_cif *)malloc(sizeof(ffi_cif));
+        
+        ffi_type *result_type = ffi_type_for_objc_type(return_type_identifier);
+        ffi_type **argument_types = (argument_count == 0) ? NULL : (ffi_type **) malloc (argument_count * sizeof(ffi_type *));
+        for (i = 0; i < argument_count; i++)
+            argument_types[i] = ffi_type_for_objc_type(argument_type_identifiers[i]);
+        
+        int status = ffi_prep_cif(cif, FFI_DEFAULT_ABI, argument_count, result_type, argument_types);
+        if (status != FFI_OK) {
+            NSLog (@"failed to prepare cif structure");
+            return [NSNull null];
+        }
+        
+        id arg_cursor = cdr;
+        void *result_value = value_buffer_for_objc_type(return_type_identifier);
+        void **argument_values = (void **) (argument_count ? malloc (argument_count * sizeof(void *)) : NULL);
+        
+        for (i = 0; i < argument_count; i++) {
+            argument_values[i] = value_buffer_for_objc_type( argument_type_identifiers[i]);
+            id arg_value = [[arg_cursor car] evalWithContext:context];
+            set_objc_value_from_nu_value(argument_values[i], arg_value, argument_type_identifiers[i]);
+            arg_cursor = [arg_cursor cdr];
+        }
+        ffi_call(cif, FFI_FN(_function), result_value, argument_values);
+        result = get_nu_value_from_objc_value(result_value, return_type_identifier);
+        
+        // free the value structures
+        for (i = 0; i < argument_count; i++) {
+            free(argument_values[i]);
+            free(argument_type_identifiers[i]);
+        }
+        free(argument_values);
+        free(result_value);
+        free(return_type_identifier);
+        free(argument_types);
+        free(cif);
+        
+        [result retain];
     }
-    //NSLog(@"calling return type is %s", return_type_identifier);
-    int i;
-    for (i = 0; i < argument_count; i++) {
-        //    NSLog(@"argument %d type is %s", i, argument_type_identifiers[i]);
-    }
-    
-    ffi_cif *cif = (ffi_cif *)malloc(sizeof(ffi_cif));
-    
-    ffi_type *result_type = ffi_type_for_objc_type(return_type_identifier);
-    ffi_type **argument_types = (argument_count == 0) ? NULL : (ffi_type **) malloc (argument_count * sizeof(ffi_type *));
-    for (i = 0; i < argument_count; i++)
-        argument_types[i] = ffi_type_for_objc_type(argument_type_identifiers[i]);
-    
-    int status = ffi_prep_cif(cif, FFI_DEFAULT_ABI, argument_count, result_type, argument_types);
-    if (status != FFI_OK) {
-        NSLog (@"failed to prepare cif structure");
-        return [NSNull null];
-    }
-    
-    id arg_cursor = cdr;
-    void *result_value = value_buffer_for_objc_type(return_type_identifier);
-    void **argument_values = (void **) (argument_count ? malloc (argument_count * sizeof(void *)) : NULL);
-    
-    for (i = 0; i < argument_count; i++) {
-        argument_values[i] = value_buffer_for_objc_type( argument_type_identifiers[i]);
-        id arg_value = [[arg_cursor car] evalWithContext:context];
-        set_objc_value_from_nu_value(argument_values[i], arg_value, argument_type_identifiers[i]);
-        arg_cursor = [arg_cursor cdr];
-    }
-    ffi_call(cif, FFI_FN(_function), result_value, argument_values);
-    result = get_nu_value_from_objc_value(result_value, return_type_identifier);
-    
-    // free the value structures
-    for (i = 0; i < argument_count; i++) {
-        free(argument_values[i]);
-        free(argument_type_identifiers[i]);
-    }
-    free(argument_values);
-    free(result_value);
-    free(return_type_identifier);
-    free(argument_types);
-    free(cif);
-    
-    [result retain];
-    [pool drain];
     [result autorelease];
     return result;
 }
@@ -2504,36 +2507,37 @@ static void objc_calling_nu_block_handler(ffi_cif* cif, void* returnvalue, void*
     int argc = cif->nargs - 1;
 	//void *ptr = (void*)args[0]  //don't need this first parameter
     // see objc_calling_nu_method_handler
-	
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
-    NuBlock *block = ((NuBlock **)userdata)[1];
-    //NSLog(@"----------------------------------------");
-    //NSLog(@"calling block %@", [block stringValue]);
-    id arguments = [[NuCell alloc] init];
-    id cursor = arguments;
-    int i;
-    for (i = 0; i < argc; i++) {
-        NuCell *nextCell = [[NuCell alloc] init];
-        [cursor setCdr:nextCell];
-        [nextCell release];
-        cursor = [cursor cdr];
-        id value = get_nu_value_from_objc_value(args[i+1], ((char **)userdata)[i+2]);
-        [cursor setCar:value];
-    }
-	//NSLog(@"in nu method handler, using arguments %@", [arguments stringValue]);
-    id result = [block evalWithArguments:[arguments cdr] context:nil];
-    //NSLog(@"in nu method handler, putting result %@ in %x with type %s", [result stringValue], (size_t) returnvalue, ((char **)userdata)[0]);
-    char *resultType = (((char **)userdata)[0])+1;// skip the first character, it's a flag
-    set_objc_value_from_nu_value(returnvalue, result, resultType);
-    [arguments release];
-    if (pool) {
+    char *resultType = NULL;
+    @autoreleasepool {
+        NuBlock *block = ((NuBlock **)userdata)[1];
+        //NSLog(@"----------------------------------------");
+        //NSLog(@"calling block %@", [block stringValue]);
+        id arguments = [[NuCell alloc] init];
+        id cursor = arguments;
+        int i;
+        for (i = 0; i < argc; i++) {
+            NuCell *nextCell = [[NuCell alloc] init];
+            [cursor setCdr:nextCell];
+            [nextCell release];
+            cursor = [cursor cdr];
+            id value = get_nu_value_from_objc_value(args[i+1], ((char **)userdata)[i+2]);
+            [cursor setCar:value];
+        }
+        //NSLog(@"in nu method handler, using arguments %@", [arguments stringValue]);
+        id result = [block evalWithArguments:[arguments cdr] context:nil];
+        //NSLog(@"in nu method handler, putting result %@ in %x with type %s", [result stringValue], (size_t) returnvalue, ((char **)userdata)[0]);
+        resultType = (((char **)userdata)[0])+1;// skip the first character, it's a flag
+        set_objc_value_from_nu_value(returnvalue, result, resultType);
+        [arguments release];
+        
         if (resultType[0] == '@')
             [*((id *)returnvalue) retain];
-        [pool release];
-        if (resultType[0] == '@')
-            [*((id *)returnvalue) autorelease];
     }
+    
+
+    if (resultType[0] == '@')
+        [*((id *)returnvalue) autorelease];
 }
 
 static char **generate_block_userdata(NuBlock *nuBlock, const char *signature){
@@ -4524,10 +4528,10 @@ static NSComparisonResult sortedArrayUsingBlockHelper(id a, id b, void *context)
         for (i = 0; i < x; i++) {
             @try
             {
-                NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-                [args setCar:[NSNumber numberWithInt:i]];
-                [block evalWithArguments:args context:[NSNull NU_null]];
-                [pool release];
+                @autoreleasepool {
+                    [args setCar:[NSNumber numberWithInt:i]];
+                    [block evalWithArguments:args context:[NSNull NU_null]];
+                }
             }
             @catch (NuBreakException *exception) {
                 break;
@@ -5971,113 +5975,111 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
         return self;
     
     // But when they're at the head of a list, that list is converted into a message that is sent to the object.
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    
+    id result = nil;
     @autoreleasepool {
-    }
-    
-    // Collect the method selector and arguments.
-    // This seems like a bottleneck, and it also lacks flexibility.
-    // Replacing explicit string building with the selector cache reduced runtimes by around 20%.
-    // Methods with variadic arguments (NSArray arrayWithObjects:...) are not supported.
-    NSMutableArray *args = [[NSMutableArray alloc] init];
-    id cursor = cdr;
-    SEL sel = 0;
-    id nextSymbol = [cursor car];
-    if (nu_objectIsKindOfClass(nextSymbol, [NuSymbol class])) {
-        // The commented out code below was the original approach.
-        // methods were identified by concatenating symbols and looking up the resulting method -- on every method call
-        // that was slow but simple
-        // NSMutableString *selectorString = [NSMutableString stringWithString:[nextSymbol stringValue]];
-        NuSelectorCache *selectorCache = [[NuSelectorCache sharedSelectorCache] lookupSymbol:nextSymbol];
-        cursor = [cursor cdr];
-        while (cursor && (cursor != [NSNull NU_null])) {
-            [args addObject:[cursor car]];
+        // Collect the method selector and arguments.
+        // This seems like a bottleneck, and it also lacks flexibility.
+        // Replacing explicit string building with the selector cache reduced runtimes by around 20%.
+        // Methods with variadic arguments (NSArray arrayWithObjects:...) are not supported.
+        NSMutableArray *args = [[NSMutableArray alloc] init];
+        id cursor = cdr;
+        SEL sel = 0;
+        id nextSymbol = [cursor car];
+        if (nu_objectIsKindOfClass(nextSymbol, [NuSymbol class])) {
+            // The commented out code below was the original approach.
+            // methods were identified by concatenating symbols and looking up the resulting method -- on every method call
+            // that was slow but simple
+            // NSMutableString *selectorString = [NSMutableString stringWithString:[nextSymbol stringValue]];
+            NuSelectorCache *selectorCache = [[NuSelectorCache sharedSelectorCache] lookupSymbol:nextSymbol];
             cursor = [cursor cdr];
-            if (cursor && (cursor != [NSNull NU_null])) {
-                id nextSymbol = [cursor car];
-                if (nu_objectIsKindOfClass(nextSymbol, [NuSymbol class]) && [nextSymbol isLabel]) {
-                    // [selectorString appendString:[nextSymbol stringValue]];
-                    selectorCache = [selectorCache lookupSymbol:nextSymbol];
-                }
-                cursor = [cursor cdr];
-            }
-        }
-        // sel = sel_getUid([selectorString cStringUsingEncoding:NSUTF8StringEncoding]);
-        sel = [selectorCache selector];
-    }
-    
-    id target = self;
-    
-    // Look up the appropriate method to call for the specified selector.
-    Method m;
-    // instead of isMemberOfClass:, which may be blocked by an NSProtocolChecker
-    BOOL isAClass = (object_getClass(self) == [NuClass class]);
-    if (isAClass) {
-        // Class wrappers (objects of type NuClass) get special treatment. Instance methods are sent directly to the class wrapper object.
-        // But when a class method is sent to a class wrapper, the method is instead sent as a class method to the wrapped class.
-        // This makes it possible to call class methods from Nu, but there is no way to directly call class methods of NuClass from Nu.
-        id wrappedClass = [((NuClass *) self) wrappedClass];
-        m = class_getClassMethod(wrappedClass, sel);
-        if (m)
-            target = wrappedClass;
-        else
-            m = class_getInstanceMethod(object_getClass(self), sel);
-    }
-    else {
-        m = class_getInstanceMethod(object_getClass(self), sel);
-        if (!m) m = class_getClassMethod(object_getClass(self), sel);
-    }
-    id result = [NSNull NU_null];
-    if (m) {
-        // We have a method that matches the selector.
-        // First, evaluate the arguments.
-        NSMutableArray *argValues = [[NSMutableArray alloc] init];
-        NSUInteger i;
-        NSUInteger imax = [args count];
-        for (i = 0; i < imax; i++) {
-            [argValues addObject:[[args objectAtIndex:i] evalWithContext:context]];
-        }
-        // Then call the method.
-        result = nu_calling_objc_method_handler(target, m, argValues);
-        [argValues release];
-    }
-    else {
-        // If the head of the list is a label, we treat the list as a property list.
-        // We just evaluate the elements of the list and return the result.
-        if (nu_objectIsKindOfClass(self, [NuSymbol class]) && [((NuSymbol *)self) isLabel]) {
-            NuCell *cell = [[[NuCell alloc] init] autorelease];
-            [cell setCar: self];
-            id cursor = cdr;
-            id result_cursor = cell;
             while (cursor && (cursor != [NSNull NU_null])) {
-                id arg = [[cursor car] evalWithContext:context];
-                [result_cursor setCdr:[[[NuCell alloc] init] autorelease]];
-                result_cursor = [result_cursor cdr];
-                [result_cursor setCar:arg];
+                [args addObject:[cursor car]];
                 cursor = [cursor cdr];
+                if (cursor && (cursor != [NSNull NU_null])) {
+                    id nextSymbol = [cursor car];
+                    if (nu_objectIsKindOfClass(nextSymbol, [NuSymbol class]) && [nextSymbol isLabel]) {
+                        // [selectorString appendString:[nextSymbol stringValue]];
+                        selectorCache = [selectorCache lookupSymbol:nextSymbol];
+                    }
+                    cursor = [cursor cdr];
+                }
             }
-            result = cell;
+            // sel = sel_getUid([selectorString cStringUsingEncoding:NSUTF8StringEncoding]);
+            sel = [selectorCache selector];
         }
-        // Messaging null is ok.
-        else if (self == [NSNull NU_null]) {
+        
+        id target = self;
+        
+        // Look up the appropriate method to call for the specified selector.
+        Method m;
+        // instead of isMemberOfClass:, which may be blocked by an NSProtocolChecker
+        BOOL isAClass = (object_getClass(self) == [NuClass class]);
+        if (isAClass) {
+            // Class wrappers (objects of type NuClass) get special treatment. Instance methods are sent directly to the class wrapper object.
+            // But when a class method is sent to a class wrapper, the method is instead sent as a class method to the wrapped class.
+            // This makes it possible to call class methods from Nu, but there is no way to directly call class methods of NuClass from Nu.
+            id wrappedClass = [((NuClass *) self) wrappedClass];
+            m = class_getClassMethod(wrappedClass, sel);
+            if (m)
+                target = wrappedClass;
+            else
+                m = class_getInstanceMethod(object_getClass(self), sel);
         }
-        // Test if target specifies another object that should receive the message
-        else if ( (target = [target forwardingTargetForSelector:sel]) ) {
-            //NSLog(@"found forwarding target: %@ for selector: %@", target, NSStringFromSelector(sel));
-            result = [target sendMessage:cdr withContext:context];
-        }
-        // Otherwise, call the overridable handler for unknown messages.
         else {
-            //NSLog(@"calling handle unknown message for %@", [cdr stringValue]);
-            result = [self handleUnknownMessage:cdr withContext:context];
-            //NSLog(@"result is %@", result);
+            m = class_getInstanceMethod(object_getClass(self), sel);
+            if (!m) m = class_getClassMethod(object_getClass(self), sel);
         }
+        result = [NSNull NU_null];
+        if (m) {
+            // We have a method that matches the selector.
+            // First, evaluate the arguments.
+            NSMutableArray *argValues = [[NSMutableArray alloc] init];
+            NSUInteger i;
+            NSUInteger imax = [args count];
+            for (i = 0; i < imax; i++) {
+                [argValues addObject:[[args objectAtIndex:i] evalWithContext:context]];
+            }
+            // Then call the method.
+            result = nu_calling_objc_method_handler(target, m, argValues);
+            [argValues release];
+        }
+        else {
+            // If the head of the list is a label, we treat the list as a property list.
+            // We just evaluate the elements of the list and return the result.
+            if (nu_objectIsKindOfClass(self, [NuSymbol class]) && [((NuSymbol *)self) isLabel]) {
+                NuCell *cell = [[[NuCell alloc] init] autorelease];
+                [cell setCar: self];
+                id cursor = cdr;
+                id result_cursor = cell;
+                while (cursor && (cursor != [NSNull NU_null])) {
+                    id arg = [[cursor car] evalWithContext:context];
+                    [result_cursor setCdr:[[[NuCell alloc] init] autorelease]];
+                    result_cursor = [result_cursor cdr];
+                    [result_cursor setCar:arg];
+                    cursor = [cursor cdr];
+                }
+                result = cell;
+            }
+            // Messaging null is ok.
+            else if (self == [NSNull NU_null]) {
+            }
+            // Test if target specifies another object that should receive the message
+            else if ( (target = [target forwardingTargetForSelector:sel]) ) {
+                //NSLog(@"found forwarding target: %@ for selector: %@", target, NSStringFromSelector(sel));
+                result = [target sendMessage:cdr withContext:context];
+            }
+            // Otherwise, call the overridable handler for unknown messages.
+            else {
+                //NSLog(@"calling handle unknown message for %@", [cdr stringValue]);
+                result = [self handleUnknownMessage:cdr withContext:context];
+                //NSLog(@"result is %@", result);
+            }
+        }
+        
+        [args release];
+        [result retain];
     }
     
-    [args release];
-    [result retain];
-    [pool drain];
     [result autorelease];
     return result;
 }
@@ -8105,39 +8107,41 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 
 @implementation Nu_let_operator
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    id result = nil;
     
-    id arg_names = [[NuCell alloc] init];
-    id arg_values = [[NuCell alloc] init];
-    
-    id cursor = [cdr car];
-    if ((cursor != [NSNull null]) && [[cursor car] atom]) {
-        [arg_names setCar:[cursor car]];
-        [arg_values setCar:[[cursor cdr] car]];
-    }
-    else {
-        id arg_name_cursor = arg_names;
-        id arg_value_cursor = arg_values;
-        while (cursor && (cursor != [NSNull NU_null])) {
-            [arg_name_cursor setCar:[[cursor car] car]];
-            [arg_value_cursor setCar:[[[cursor car] cdr] car]];
-            cursor = [cursor cdr];
-            if (cursor && (cursor != [NSNull NU_null])) {
-                [arg_name_cursor setCdr:[[[NuCell alloc] init] autorelease]];
-                [arg_value_cursor setCdr:[[[NuCell alloc] init] autorelease]];
-                arg_name_cursor = [arg_name_cursor cdr];
-                arg_value_cursor = [arg_value_cursor cdr];
+    @autoreleasepool {
+        id arg_names = [[NuCell alloc] init];
+        id arg_values = [[NuCell alloc] init];
+        
+        id cursor = [cdr car];
+        if ((cursor != [NSNull null]) && [[cursor car] atom]) {
+            [arg_names setCar:[cursor car]];
+            [arg_values setCar:[[cursor cdr] car]];
+        }
+        else {
+            id arg_name_cursor = arg_names;
+            id arg_value_cursor = arg_values;
+            while (cursor && (cursor != [NSNull NU_null])) {
+                [arg_name_cursor setCar:[[cursor car] car]];
+                [arg_value_cursor setCar:[[[cursor car] cdr] car]];
+                cursor = [cursor cdr];
+                if (cursor && (cursor != [NSNull NU_null])) {
+                    [arg_name_cursor setCdr:[[[NuCell alloc] init] autorelease]];
+                    [arg_value_cursor setCdr:[[[NuCell alloc] init] autorelease]];
+                    arg_name_cursor = [arg_name_cursor cdr];
+                    arg_value_cursor = [arg_value_cursor cdr];
+                }
             }
         }
+        id body = [cdr cdr];
+        NuBlock *block = [[NuBlock alloc] initWithParameters:arg_names body:body context:context];
+        result = [[block evalWithArguments:arg_values context:context] retain];
+        [block release];
+        
+        [arg_names release];
+        [arg_values release];
     }
-    id body = [cdr cdr];
-    NuBlock *block = [[NuBlock alloc] initWithParameters:arg_names body:body context:context];
-    id result = [[block evalWithArguments:arg_values context:context] retain];
-    [block release];
     
-    [arg_names release];
-    [arg_values release];
-    [pool drain];
     [result autorelease];
     return result;
 }
@@ -9405,11 +9409,13 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
 }
 
 - (NSString *) parseEval:(NSString *)string{
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    NuCell *expressions = [self parse:string];
-    id result = [[expressions evalWithContext:_context] stringValue];
-    [result retain];
-    [pool drain];
+    id result = nil;
+    @autoreleasepool {
+        NuCell *expressions = [self parse:string];
+        id result = [[expressions evalWithContext:_context] stringValue];
+        [result retain];
+    }
+
     [result autorelease];
     return result;
 }
@@ -9439,74 +9445,74 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
     }
     
     do {
-        NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-        char *prompt = ([self incomplete] ? "- " : "% ");
+        @autoreleasepool {
+            char *prompt = ([self incomplete] ? "- " : "% ");
 #ifdef IPHONENOREADLINE
-        puts(prompt);
-        char line[1024];                          // careful
-        int count = gets(line);
+            puts(prompt);
+            char line[1024];                          // careful
+            int count = gets(line);
 #else
-        char *line = readline(prompt);
-        if (line && *line && strcmp(line, "quit"))
-            add_history (line);
+            char *line = readline(prompt);
+            if (line && *line && strcmp(line, "quit"))
+                add_history (line);
 #endif
-        if(!line || !strcmp(line, "quit")) {
-            break;
-        }
-        else {
-            id progn = nil;
-            
-            @try
-            {
-                progn = [[self parse:[NSString stringWithCString:line encoding:NSUTF8StringEncoding]] retain];
+            if(!line || !strcmp(line, "quit")) {
+                break;
             }
-            @catch (NuException* nuException) {
-                printf("%s\n", [[nuException dump] cStringUsingEncoding:NSUTF8StringEncoding]);
-                [self reset];
-            }
-            @catch (id exception) {
-                printf("%s: %s\n",
-                       [[exception name] cStringUsingEncoding:NSUTF8StringEncoding],
-                       [[exception reason] cStringUsingEncoding:NSUTF8StringEncoding]);
-                [self reset];
-            }
-            
-            if (progn && (progn != [NSNull null])) {
-                id cursor = [progn cdr];
-                while (cursor && (cursor != [NSNull null])) {
-                    if ([cursor car] != [NSNull null]) {
-                        id expression = [cursor car];
-                        //printf("evaluating %s\n", [[expression stringValue] cStringUsingEncoding:NSUTF8StringEncoding]);
-                        
-                        @try
-                        {
-                            id result = [expression evalWithContext:_context];
-                            if (result) {
-                                id stringToDisplay;
-                                if ([result respondsToSelector:@selector(escapedStringRepresentation)]) {
-                                    stringToDisplay = [result escapedStringRepresentation];
+            else {
+                id progn = nil;
+                
+                @try
+                {
+                    progn = [[self parse:[NSString stringWithCString:line encoding:NSUTF8StringEncoding]] retain];
+                }
+                @catch (NuException* nuException) {
+                    printf("%s\n", [[nuException dump] cStringUsingEncoding:NSUTF8StringEncoding]);
+                    [self reset];
+                }
+                @catch (id exception) {
+                    printf("%s: %s\n",
+                           [[exception name] cStringUsingEncoding:NSUTF8StringEncoding],
+                           [[exception reason] cStringUsingEncoding:NSUTF8StringEncoding]);
+                    [self reset];
+                }
+                
+                if (progn && (progn != [NSNull null])) {
+                    id cursor = [progn cdr];
+                    while (cursor && (cursor != [NSNull null])) {
+                        if ([cursor car] != [NSNull null]) {
+                            id expression = [cursor car];
+                            //printf("evaluating %s\n", [[expression stringValue] cStringUsingEncoding:NSUTF8StringEncoding]);
+                            
+                            @try
+                            {
+                                id result = [expression evalWithContext:_context];
+                                if (result) {
+                                    id stringToDisplay;
+                                    if ([result respondsToSelector:@selector(escapedStringRepresentation)]) {
+                                        stringToDisplay = [result escapedStringRepresentation];
+                                    }
+                                    else {
+                                        stringToDisplay = [result stringValue];
+                                    }
+                                    printf("%s\n", [stringToDisplay cStringUsingEncoding:NSUTF8StringEncoding]);
                                 }
-                                else {
-                                    stringToDisplay = [result stringValue];
-                                }
-                                printf("%s\n", [stringToDisplay cStringUsingEncoding:NSUTF8StringEncoding]);
+                            }
+                            @catch (NuException* nuException) {
+                                printf("%s\n", [[nuException dump] cStringUsingEncoding:NSUTF8StringEncoding]);
+                            }
+                            @catch (id exception) {
+                                printf("%s: %s\n",
+                                       [[exception name] cStringUsingEncoding:NSUTF8StringEncoding],
+                                       [[exception reason] cStringUsingEncoding:NSUTF8StringEncoding]);
                             }
                         }
-                        @catch (NuException* nuException) {
-                            printf("%s\n", [[nuException dump] cStringUsingEncoding:NSUTF8StringEncoding]);
-                        }
-                        @catch (id exception) {
-                            printf("%s: %s\n",
-                                   [[exception name] cStringUsingEncoding:NSUTF8StringEncoding],
-                                   [[exception reason] cStringUsingEncoding:NSUTF8StringEncoding]);
-                        }
+                        cursor = [cursor cdr];
                     }
-                    cursor = [cursor cdr];
                 }
+                [progn release];
             }
-            [progn release];
         }
-        [pool release];
     } while(1);
     
     if (valid_history_file) {
@@ -9520,10 +9526,11 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
 
 #if !TARGET_OS_IPHONE
 + (int) main{
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    NuParser *parser = [Nu sharedParser];
-    int result = [parser interact];
-    [pool drain];
+    int result = 0;
+    @autoreleasepool {
+        NuParser *parser = [Nu sharedParser];
+        result = [parser interact];
+    }
     return result;
 }
 #endif
@@ -10115,19 +10122,19 @@ static NuProfiler *defaultProfiler = nil;
 @end
 
 static void nu_swizzleContainerClasses(){
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    Class NSCFDictionary = NSClassFromString(@"NSCFDictionary");
-    Class NSCFArray = NSClassFromString(@"NSCFArray");
-    Class NSCFSet = NSClassFromString(@"NSCFSet");
-    [NSCFDictionary include:[NuClass classWithName:@"NSCFDictionarySwizzles"]];
-    [NSCFArray include:[NuClass classWithName:@"NSCFArraySwizzles"]];
-    [NSCFSet include:[NuClass classWithName:@"NSCFSetSwizzles"]];
-    [NSCFDictionary exchangeInstanceMethod:@selector(setObject:forKey:) withMethod:@selector(nuSetObject:forKey:)];
-    [NSCFArray exchangeInstanceMethod:@selector(addObject:) withMethod:@selector(nuAddObject:)];
-    [NSCFArray exchangeInstanceMethod:@selector(insertObject:atIndex:) withMethod:@selector(nuInsertObject:atIndex:)];
-    [NSCFArray exchangeInstanceMethod:@selector(replaceObjectAtIndex:withObject:) withMethod:@selector(nuReplaceObjectAtIndex:withObject:)];
-    [NSCFSet exchangeInstanceMethod:@selector(addObject:) withMethod:@selector(nuAddObject:)];
-    [pool drain];
+    @autoreleasepool {
+        Class NSCFDictionary = NSClassFromString(@"NSCFDictionary");
+        Class NSCFArray = NSClassFromString(@"NSCFArray");
+        Class NSCFSet = NSClassFromString(@"NSCFSet");
+        [NSCFDictionary include:[NuClass classWithName:@"NSCFDictionarySwizzles"]];
+        [NSCFArray include:[NuClass classWithName:@"NSCFArraySwizzles"]];
+        [NSCFSet include:[NuClass classWithName:@"NSCFSetSwizzles"]];
+        [NSCFDictionary exchangeInstanceMethod:@selector(setObject:forKey:) withMethod:@selector(nuSetObject:forKey:)];
+        [NSCFArray exchangeInstanceMethod:@selector(addObject:) withMethod:@selector(nuAddObject:)];
+        [NSCFArray exchangeInstanceMethod:@selector(insertObject:atIndex:) withMethod:@selector(nuInsertObject:atIndex:)];
+        [NSCFArray exchangeInstanceMethod:@selector(replaceObjectAtIndex:withObject:) withMethod:@selector(nuReplaceObjectAtIndex:withObject:)];
+        [NSCFSet exchangeInstanceMethod:@selector(addObject:) withMethod:@selector(nuAddObject:)];
+    }
 }
 
 #pragma mark - NuSymbol.m
