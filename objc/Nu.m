@@ -8544,7 +8544,7 @@ static char *g_filenames[MAX_FILES];
 static int g_filecount = 0;
 
 // Turn debug output on and off for this file only
-#define PARSER_DEBUG 1
+//#define PARSER_DEBUG 1
 
 #ifdef PARSER_DEBUG
 #define ParserDebug(arg...) NSLog(arg)
