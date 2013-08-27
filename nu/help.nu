@@ -192,25 +192,11 @@ within the operator may be used to add
 instance methods, class methods, and instance
 variables to the class.END)
 
-(class-help Nu_imethod_operator <<-END
-This operator adds an instance method to a class.
-It should only be used within a class operator.END)
-
-(class-help Nu_cmethod_operator <<-END
-This operator adds a class method to a class.
-It should only be used within a class operator.END)
-
 (class-help Nu_ivar_operator <<-END
 This operator adds typed instance variables to a class.
 It should only be used before any instances of the
 associated class have been created.END)
 
-(class-help Nu_ivars_operator <<-END
-This operator adds dynamic instance variables to a class.
-These variables are stored in a dictionary and may be
-added at any time, but this operator should only be used
-before any instances of the associated class have been
-created.END)
 
 (class-help Nu_send_operator <<-END
 This operator sends a message to an object.  Normally
