@@ -5650,7 +5650,7 @@ static NSMutableDictionary *handlerWarehouse = nil;
 }
 
 - (NSString *) name{
-    return _m ? [NSString stringWithCString:(sel_getName(method_getName(_m))) encoding:NSUTF8StringEncoding] : [NSNull null];
+    return (id)_m ? [NSString stringWithCString:(sel_getName(method_getName(_m))) encoding:NSUTF8StringEncoding] : [NSNull NU_null];
 }
 
 - (int) argumentCount{
