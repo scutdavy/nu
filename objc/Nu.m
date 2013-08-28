@@ -9517,9 +9517,9 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
 #pragma mark - NuPointer.m
 
 @interface NuPointer (){
-    void *pointer;
-    NSString *typeString;
-    bool thePointerIsMine;
+    void *_pointer;
+    NSString *_typeString;
+    bool _thePointerIsMine;
 }
 @end
 
@@ -9527,34 +9527,34 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
 
 - (id) init{
     if ((self = [super init])) {
-        pointer = 0;
-        typeString = nil;
-        thePointerIsMine = NO;
+        _pointer = 0;
+        _typeString = nil;
+        _thePointerIsMine = NO;
     }
     return self;
 }
 
-- (void *) pointer {return pointer;}
+- (void *) pointer {return _pointer;}
 
 - (void) setPointer:(void *) p{
-    pointer = p;
+    _pointer = p;
 }
 
-- (NSString *) typeString {return typeString;}
+- (NSString *) typeString {return _typeString;}
 
 - (id) object{
-    return pointer;
+    return _pointer;
 }
 
 - (void) setTypeString:(NSString *) s{
     [s retain];
-    [typeString release];
-    typeString = s;
+    [_typeString release];
+    _typeString = s;
 }
 
 - (void) allocateSpaceForTypeString:(NSString *) s{
-    if (thePointerIsMine)
-        free(pointer);
+    if (_thePointerIsMine)
+        free(_pointer);
     [self setTypeString:s];
     const char *type = [s cStringUsingEncoding:NSUTF8StringEncoding];
     while (*type && (*type != '^'))
@@ -9562,25 +9562,25 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
     if (*type)
         type++;
     //NSLog(@"allocating space for type %s", type);
-    pointer = value_buffer_for_objc_type(type);
-    thePointerIsMine = YES;
+    _pointer = value_buffer_for_objc_type(type);
+    _thePointerIsMine = YES;
 }
 
 - (void) dealloc{
-    [typeString release];
-    if (thePointerIsMine)
-        free(pointer);
+    [_typeString release];
+    if (_thePointerIsMine)
+        free(_pointer);
     [super dealloc];
 }
 
 - (id) value{
-    const char *type = [typeString cStringUsingEncoding:NSUTF8StringEncoding];
+    const char *type = [_typeString cStringUsingEncoding:NSUTF8StringEncoding];
     while (*type && (*type != '^'))
         type++;
     if (*type)
         type++;
     //NSLog(@"getting value for type %s", type);
-    return get_nu_value_from_objc_value(pointer, type);
+    return get_nu_value_from_objc_value(_pointer, type);
 }
 
 @end
@@ -9628,8 +9628,8 @@ static NSUInteger nu_parse_escape_sequences(NSString *string, NSUInteger i, NSUI
 @end
 
 @interface NuProfiler (){
-    NSMutableDictionary *sections;
-    NuProfileStackElement *stack;
+    NSMutableDictionary *_sections;
+    NuProfileStackElement *_stack;
 }
 @end
 
@@ -9645,8 +9645,8 @@ static NuProfiler *defaultProfiler = nil;
 
 - (NuProfiler *) init{
     self = [super init];
-    sections = [[NSMutableDictionary alloc] init];
-    stack = nil;
+    _sections = [[NSMutableDictionary alloc] init];
+    _stack = nil;
     return self;
 }
 
@@ -9654,45 +9654,45 @@ static NuProfiler *defaultProfiler = nil;
     NuProfileStackElement *stackElement = [[NuProfileStackElement alloc] init];
     stackElement->name = [name retain];
     stackElement->start = mach_absolute_time();
-    stackElement->parent = stack;
-    stack = stackElement;
+    stackElement->parent = _stack;
+    _stack = stackElement;
 }
 
 - (void) stop{
-    if (stack) {
+    if (_stack) {
         uint64_t current_time = mach_absolute_time();
-        uint64_t time_delta = current_time - stack->start;
+        uint64_t time_delta = current_time - _stack->start;
         struct mach_timebase_info info;
         mach_timebase_info(&info);
         float timeDelta = 1e-9 * time_delta * (double) info.numer / info.denom;
         //NSNumber *delta = [NSNumber numberWithFloat:timeDelta];
-        NuProfileTimeSlice *entry = [sections objectForKey:stack->name];
+        NuProfileTimeSlice *entry = [_sections objectForKey:_stack->name];
         if (!entry) {
             entry = [[[NuProfileTimeSlice alloc] init] autorelease];
             entry->count = 1;
             entry->time = timeDelta;
-            [sections setObject:entry forKey:stack->name];
+            [_sections setObject:entry forKey:_stack->name];
         }
         else {
             entry->count++;
             entry->time += timeDelta;
         }
-        [stack->name release];
-        NuProfileStackElement *top = stack;
-        stack = stack->parent;
+        [_stack->name release];
+        NuProfileStackElement *top = _stack;
+        _stack = _stack->parent;
         [top release];
     }
 }
 
 - (NSMutableDictionary *) sections{
-    return sections;
+    return _sections;
 }
 
 - (void) reset{
-    [sections removeAllObjects];
-    while (stack) {
-        NuProfileStackElement *top = stack;
-        stack = stack->parent;
+    [_sections removeAllObjects];
+    while (_stack) {
+        NuProfileStackElement *top = _stack;
+        _stack = _stack->parent;
         [top release];
     }
 }
@@ -9702,7 +9702,7 @@ static NuProfiler *defaultProfiler = nil;
 #pragma mark - NuProperty.m
 
 @interface NuProperty (){
-    objc_property_t p;
+    objc_property_t _p;
 }
 @end
 
@@ -9714,13 +9714,13 @@ static NuProfiler *defaultProfiler = nil;
 
 - (id) initWithProperty:(objc_property_t) property{
     if ((self = [super init])) {
-        p = property;
+        _p = property;
     }
     return self;
 }
 
 - (NSString *) name{
-    return [NSString stringWithCString:property_getName(p) encoding:NSUTF8StringEncoding];
+    return [NSString stringWithCString:property_getName(_p) encoding:NSUTF8StringEncoding];
 }
 
 @end
@@ -9728,8 +9728,8 @@ static NuProfiler *defaultProfiler = nil;
 #pragma mark - NuReference.m
 
 @interface NuReference (){
-    id *pointer;
-    bool thePointerIsMine;
+    id *_pointer;
+    bool _thePointerIsMine;
 }
 @end
 
@@ -9737,49 +9737,49 @@ static NuProfiler *defaultProfiler = nil;
 
 - (id) init{
     if ((self = [super init])) {
-        pointer = 0;
-        thePointerIsMine = false;
+        _pointer = 0;
+        _thePointerIsMine = false;
     }
     return self;
 }
 
-- (id) value {return pointer ? *pointer : nil;}
+- (id) value {return _pointer ? *_pointer : nil;}
 
 - (void) setValue:(id) v{
-    if (!pointer) {
-        pointer = (id *) malloc (sizeof (id));
-        *pointer = nil;
-        thePointerIsMine = true;
+    if (!_pointer) {
+        _pointer = (id *) malloc (sizeof (id));
+        *_pointer = nil;
+        _thePointerIsMine = true;
     }
     [v retain];
-    [(*pointer) release];
-    (*pointer)  = v;
+    [(*_pointer) release];
+    (*_pointer)  = v;
 }
 
 - (void) setPointer:(id *) p{
-    if (thePointerIsMine) {
-        free(pointer);
-        thePointerIsMine = false;
+    if (_thePointerIsMine) {
+        free(_pointer);
+        _thePointerIsMine = false;
     }
-    pointer = p;
+    _pointer = p;
 }
 
 - (id *) pointerToReferencedObject{
-    if (!pointer) {
-        pointer = (id *) malloc (sizeof (id));
-        *pointer = nil;
-        thePointerIsMine = true;
+    if (!_pointer) {
+        _pointer = (id *) malloc (sizeof (id));
+        *_pointer = nil;
+        _thePointerIsMine = true;
     }
-    return pointer;
+    return _pointer;
 }
 
 - (void) retainReferencedObject{
-    [(*pointer) retain];
+    [(*_pointer) retain];
 }
 
 - (void) dealloc{
-    if (thePointerIsMine)
-        free(pointer);
+    if (_thePointerIsMine)
+        free(_pointer);
     [super dealloc];
 }
 
@@ -9938,32 +9938,31 @@ static NuProfiler *defaultProfiler = nil;
 
 #pragma mark - NuStack.m
 
-@interface NuStack (){
-    NSMutableArray *storage;
-}
+@interface NuStack ()
+@property (nonatomic, strong) NSMutableArray *storage;
 @end
 
 @implementation NuStack
 - (id) init{
     if ((self = [super init])) {
-        storage = [[NSMutableArray alloc] init];
+        _storage = [[NSMutableArray alloc] init];
     }
     return self;
 }
 
 - (void) dealloc{
-    [storage release];
+    [_storage release];
     [super dealloc];
 }
 
 - (void) push:(id) object{
-    [storage addObject:object];
+    [_storage addObject:object];
 }
 
 - (id) pop{
-    if ([storage count] > 0) {
-        id object = [[storage lastObject] retain];
-        [storage removeLastObject];
+    if ([_storage count] > 0) {
+        id object = [[_storage lastObject] retain];
+        [_storage removeLastObject];
 		[object autorelease];
         return object;
     }
@@ -9973,38 +9972,37 @@ static NuProfiler *defaultProfiler = nil;
 }
 
 - (NSUInteger) depth{
-    return [storage count];
+    return [_storage count];
 }
 
 - (id) top{
-    return [storage lastObject];
+    return [_storage lastObject];
 }
 
 - (id) objectAtIndex:(int) i{
-	return [storage objectAtIndex:i];
+	return [_storage objectAtIndex:i];
 }
 
 - (void) dump{
-    for (NSInteger i = [storage count]-1; i >= 0; i--) {
-        NSLog(@"stack: %@", [storage objectAtIndex:i]);
+    for (NSInteger i = [_storage count]-1; i >= 0; i--) {
+        NSLog(@"stack: %@", [_storage objectAtIndex:i]);
     }
 }
 
 @end
 
 #pragma mark - NuSuper.m
-@interface NuSuper (){
-    id object;
-    Class class;
-}
+@interface NuSuper ()
+@property (nonatomic, assign) id object;
+@property (nonatomic, assign) Class class;
 @end
 
 @implementation NuSuper
 
 - (NuSuper *) initWithObject:(id) o ofClass:(Class) c{
     if ((self = [super init])) {
-        object = o; // weak reference
-        class = c; // weak reference
+        _object = o; // weak reference
+        _class = c; // weak reference
     }
     return self;
 }
@@ -10016,7 +10014,7 @@ static NuProfiler *defaultProfiler = nil;
 - (id) evalWithArguments:(id)cdr context:(NSMutableDictionary *)context{
     // By themselves, Objective-C objects evaluate to themselves.
     if (!cdr || (cdr == [NSNull null]))
-        return object;
+        return _object;
     
     //NSLog(@"messaging super with %@", [cdr stringValue]);
     // But when they're at the head of a list, the list is converted to a message and sent to the object
@@ -10037,13 +10035,13 @@ static NuProfiler *defaultProfiler = nil;
     SEL sel = sel_getUid([selectorString cStringUsingEncoding:NSUTF8StringEncoding]);
     
     // we're going to send the message to the handler of its superclass instead of one defined for its class.
-    Class c = class_getSuperclass(class);
+    Class c = class_getSuperclass(_class);
     Method m = class_getInstanceMethod(c, sel);
     if (!m) m = class_getClassMethod(c, sel);
     
     id result;
     if (m) {
-        result = nu_calling_objc_method_handler(object, m, args);
+        result = nu_calling_objc_method_handler(_object, m, args);
     }
     else {
         NSLog(@"can't find function in superclass!");
@@ -10468,9 +10466,7 @@ static BOOL verbose_helper = false;
 
 @end
 
-@interface NuTestHelper : NSObject{
-}
-
+@interface NuTestHelper : NSObject
 @end
 
 static int deallocationCount = 0;
@@ -10540,9 +10536,7 @@ static int deallocationCount = 0;
 
 
 #ifdef NO_NU
-@interface NuOperator : NSObject{
-}
-
+@interface NuOperator : NSObject
 - (id) evalWithArguments:(id) cdr context:(NSMutableDictionary *) context;
 - (id) callWithArguments:(id) cdr context:(NSMutableDictionary *) context;
 @end
