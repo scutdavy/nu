@@ -2789,12 +2789,9 @@ static NSString *getTypeStringFromNode(id node){
 
 #pragma mark - NuCell.m
 
-@interface NuCell (){
-    id _car;
-    id _cdr;
-    int _file;
-    int _line;
-}
+@interface NuCell ()
+@property (nonatomic) int file;
+@property (nonatomic) int line;
 @end
 
 @implementation NuCell
@@ -2823,22 +2820,6 @@ static NSString *getTypeStringFromNode(id node){
 }
 
 - (bool) atom {return false;}
-
-- (id) car {return _car;}
-
-- (id) cdr {return _cdr;}
-
-- (void) setCar:(id) c{
-    [c retain];
-    [_car release];
-    _car = c;
-}
-
-- (void) setCdr:(id) c{
-    [c retain];
-    [_cdr release];
-    _cdr = c;
-}
 
 // additional accessors, for efficiency (from Nu)
 - (id) caar {return [_car car];}
@@ -2994,7 +2975,7 @@ static NSString *getTypeStringFromNode(id node){
 }
 
 - (void) addToException:(NuException*)e value:(id)value{
-    const char *parsedFilename = nu_parsedFilename(self->_file);
+    const char *parsedFilename = nu_parsedFilename(self.file);
     
     if (parsedFilename) {
         NSString* filename = [NSString stringWithCString:parsedFilename encoding:NSUTF8StringEncoding];
@@ -3014,8 +2995,8 @@ static NSString *getTypeStringFromNode(id node){
         value = [_car evalWithContext:context];
         
         if (NU_LIST_EVAL_BEGIN_ENABLED()) {
-            if ((self->_line != -1) && (self->_file != -1)) {
-                NU_LIST_EVAL_BEGIN(nu_parsedFilename(self->_file), self->_line);
+            if ((_line != -1) && (_file != -1)) {
+                NU_LIST_EVAL_BEGIN(nu_parsedFilename(_file), _line);
             }
             else {
                 NU_LIST_EVAL_BEGIN("", 0);
@@ -3027,8 +3008,8 @@ static NSString *getTypeStringFromNode(id node){
         result = [value evalWithArguments:_cdr context:context];
         
         if (NU_LIST_EVAL_END_ENABLED()) {
-            if ((self->_line != -1) && (self->_file != -1)) {
-                NU_LIST_EVAL_END(nu_parsedFilename(self->_file), self->_line);
+            if ((_line != -1) && (_file != -1)) {
+                NU_LIST_EVAL_END(nu_parsedFilename(_file), _line);
             }
             else {
                 NU_LIST_EVAL_END("", 0);
@@ -3246,8 +3227,6 @@ static NSString *getTypeStringFromNode(id node){
     _line = l;
 }
 
-- (int) file {return _file;}
-- (int) line {return _line;}
 @end
 
 @interface NuCellWithComments (){

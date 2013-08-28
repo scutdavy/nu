@@ -94,17 +94,11 @@
  In Nu, nil is represented with the <code>[NSNull null]</code> object.
  */
 @interface NuCell : NSObject <NSCoding>
+@property (nonatomic, strong) id car;
+@property (nonatomic, strong) id cdr;
 
 /*! Create a new cell with a specifed car and cdr. */
 + (id) cellWithCar:(id)car cdr:(id)cdr;
-/*! Get the car of a NuCell. */
-- (id) car;
-/*! Get the cdr of a NuCell. */
-- (id) cdr;
-/*! Set the car of a NuCell. */
-- (void) setCar:(id) c;
-/*! Set the cdr of a NuCell. */
-- (void) setCdr:(id) c;
 /*! Get the last object in a list by traversing the list. Use this carefully. */
 - (id) lastObject;
 /*! Get a string representation of a list. In many cases, this can be parsed to produce the original list. */
