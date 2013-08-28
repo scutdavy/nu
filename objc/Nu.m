@@ -10156,16 +10156,22 @@ static void nu_swizzleContainerClasses(){
     install(@"defined",  Nu_defined_operator);
     
     install(@"eq",       Nu_eq_operator);
+    install(@"eq?",      Nu_eq_operator);
     install(@"==",       Nu_eq_operator);
     install(@"ne",       Nu_neq_operator);
+    install(@"ne?",      Nu_neq_operator);
     install(@"!=",       Nu_neq_operator);
     install(@"gt",       Nu_greaterthan_operator);
+    install(@"gt?",      Nu_greaterthan_operator);
     install(@">",        Nu_greaterthan_operator);
     install(@"lt",       Nu_lessthan_operator);
+    install(@"lt?",      Nu_lessthan_operator);
     install(@"<",        Nu_lessthan_operator);
     install(@"ge",       Nu_gte_operator);
+    install(@"ge?",      Nu_gte_operator);
     install(@">=",       Nu_gte_operator);
     install(@"le",       Nu_lte_operator);
+    install(@"le?",      Nu_lte_operator);
     install(@"<=",       Nu_lte_operator);
     
     install(@"cons",     Nu_cons_operator);
