@@ -68,7 +68,7 @@
 #import "Nu.h"
 
 #define IS_NOT_NULL(xyz) ((xyz) && (((id) (xyz)) != [NSNull null]))
-
+typedef BOOL(^NUCellPairBlock)(id value1, id value2);
 // We'd like for this to be in the ObjC2 API, but it isn't.
 static void nu_class_addInstanceVariable_withSignature(Class thisClass, const char *variableName, const char *signature);
 
@@ -100,6 +100,8 @@ static size_t size_of_objc_type(const char *typeString);
     return [NSNull null];
 }
 @end
+
+
 #pragma mark - NuHandler.h
 
 struct nu_handler_description{
@@ -133,6 +135,22 @@ static void nu_handler(void *return_value,
 
 // Use this key to get the parent context of an execution context.
 #define PARENT_KEY @"parent"
+
+@interface NSMutableDictionary (nu_true_symbol)
+- (id) NU_true;
+- (id) NU_false;
+@end
+
+@implementation NSMutableDictionary (nu_true_symbol)
+- (id) NU_true{
+    NuSymbolTable *symbolTable = [self objectForKey:SYMBOLS_KEY];
+    return [symbolTable symbolWithString:@"t"];
+}
+
+- (id) NU_false{
+    return [NSNull NU_null];
+}
+@end
 
 /*!
  @class NuBreakException
@@ -2790,7 +2808,9 @@ static NSString *getTypeStringFromNode(id node){
 @interface NuCell ()
 @property (nonatomic) int file;
 @property (nonatomic) int line;
-@end
+- (id) allChainedPairs:(NUCellPairBlock) block context:(NSMutableDictionary *) context;
+- (id) eitherChainedPairs:(NUCellPairBlock) block context:(NSMutableDictionary *) context;
+    @end
 
 @implementation NuCell
 
@@ -2982,6 +3002,45 @@ static NSString *getTypeStringFromNode(id node){
     else {
         [e addFunction:value lineNumber:[self line]];
     }
+}
+
+
+- (id) allChainedPairs:(NUCellPairBlock) block context:(NSMutableDictionary *) context{
+    NSParameterAssert(block);
+    id cursor = self;
+    NSParameterAssert([cursor cdr]);
+    id current = [[cursor car] evalWithContext:context];
+    
+    while (cursor && (cursor != [NSNull NU_null]) &&
+           [cursor cdr] && [cursor cdr] != [NSNull NU_null]) {
+        id next = [[[cursor cdr] car] evalWithContext:context];
+        if (!block(current, next)) {
+            return [context NU_false];
+        }
+        current = next;
+        cursor = [cursor cdr];
+    }
+
+    return [context NU_true];
+}
+
+- (id) eitherChainedPairs:(NUCellPairBlock) block context:(NSMutableDictionary *) context{
+    NSParameterAssert(block);
+    id cursor = self;
+    NSParameterAssert([cursor cdr]);
+    id current = [[cursor car] evalWithContext:context];
+    
+    while (cursor && (cursor != [NSNull NU_null]) &&
+           [cursor cdr] && [cursor cdr] != [NSNull NU_null]) {
+        id next = [[[cursor cdr] car] evalWithContext:context];
+        if (block(current, next)) {
+            return [context NU_true];
+        }
+        current = next;
+        cursor = [cursor cdr];
+    }
+    
+    return [context NU_false];
 }
 
 - (id) evalWithContext:(NSMutableDictionary *)context{
@@ -6613,18 +6672,9 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 
 @implementation Nu_eq_operator
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    NuSymbolTable *symbolTable = [context objectForKey:SYMBOLS_KEY];
-    id cursor = cdr;
-    id current = [[cursor car] evalWithContext:context];
-    cursor = [cursor cdr];
-    while (cursor && (cursor != [NSNull NU_null])) {
-        id next = [[cursor car] evalWithContext: context];
-        if (![current isEqual:next])
-            return [NSNull NU_null];
-        current = next;
-        cursor = [cursor cdr];
-    }
-    return [symbolTable symbolWithString:@"t"];
+    return [cdr allChainedPairs:^BOOL(id value1, id value2) {
+        return [value1 isEqual:value2];
+    } context:context];
 }
 
 @end
@@ -6634,20 +6684,9 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 
 @implementation Nu_neq_operator
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    id cadr = [cdr car];
-    id caddr = [[cdr cdr] car];
-    id value1 = [cadr evalWithContext:context];
-    id value2 = [caddr evalWithContext:context];
-    NuSymbolTable *symbolTable = [context objectForKey:SYMBOLS_KEY];
-    if ((value1 == nil) && (value2 == nil)) {
-        return [NSNull NU_null];
-    }
-    else if ([value1 isEqual:value2]) {
-        return [NSNull NU_null];
-    }
-    else {
-        return [symbolTable symbolWithString:@"t"];
-    }
+    return [cdr eitherChainedPairs:^BOOL(id value1, id value2) {
+        return ![value1 isEqual:value2];
+    } context:context];
 }
 
 @end
@@ -7717,19 +7756,9 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 
 @implementation Nu_greaterthan_operator
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    NuSymbolTable *symbolTable = [context objectForKey:SYMBOLS_KEY];
-    id cursor = cdr;
-    id current = [[cursor car] evalWithContext:context];
-    cursor = [cursor cdr];
-    while (cursor && (cursor != [NSNull NU_null])) {
-        id next = [[cursor car] evalWithContext:context];
-        NSComparisonResult result = [current compare:next];
-        if (result != NSOrderedDescending)
-            return [NSNull NU_null];
-        current = next;
-        cursor = [cursor cdr];
-    }
-    return [symbolTable symbolWithString:@"t"];
+    return [cdr allChainedPairs:^BOOL(id value1, id value2) {
+        return [value1 compare:value2] == NSOrderedDescending;
+    } context:context];
 }
 
 @end
@@ -7739,19 +7768,9 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 
 @implementation Nu_lessthan_operator
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    NuSymbolTable *symbolTable = [context objectForKey:SYMBOLS_KEY];
-    id cursor = cdr;
-    id current = [[cursor car] evalWithContext:context];
-    cursor = [cursor cdr];
-    while (cursor && (cursor != [NSNull NU_null])) {
-        id next = [[cursor car] evalWithContext:context];
-        NSComparisonResult result = [current compare:next];
-        if (result != NSOrderedAscending)
-            return [NSNull NU_null];
-        current = next;
-        cursor = [cursor cdr];
-    }
-    return [symbolTable symbolWithString:@"t"];
+    return [cdr allChainedPairs:^BOOL(id value1, id value2) {
+        return [value1 compare:value2] == NSOrderedAscending;
+    } context:context];
 }
 
 @end
@@ -7761,19 +7780,10 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 
 @implementation Nu_gte_operator
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    NuSymbolTable *symbolTable = [context objectForKey:SYMBOLS_KEY];
-    id cursor = cdr;
-    id current = [[cursor car] evalWithContext:context];
-    cursor = [cursor cdr];
-    while (cursor && (cursor != [NSNull NU_null])) {
-        id next = [[cursor car] evalWithContext:context];
-        NSComparisonResult result = [current compare:next];
-        if (result == NSOrderedAscending)
-            return [NSNull NU_null];
-        current = next;
-        cursor = [cursor cdr];
-    }
-    return [symbolTable symbolWithString:@"t"];
+    return [cdr allChainedPairs:^BOOL(id value1, id value2) {
+        NSComparisonResult result = [value1 compare:value2];
+        return result == NSOrderedDescending || result == NSOrderedSame;
+    } context:context];
 }
 
 @end
@@ -7783,19 +7793,10 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 
 @implementation Nu_lte_operator
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    NuSymbolTable *symbolTable = [context objectForKey:SYMBOLS_KEY];
-    id cursor = cdr;
-    id current = [[cursor car] evalWithContext:context];
-    cursor = [cursor cdr];
-    while (cursor && (cursor != [NSNull NU_null])) {
-        id next = [[cursor car] evalWithContext:context];
-        NSComparisonResult result = [current compare:next];
-        if (result == NSOrderedDescending)
-            return [NSNull NU_null];
-        current = next;
-        cursor = [cursor cdr];
-    }
-    return [symbolTable symbolWithString:@"t"];
+    return [cdr allChainedPairs:^BOOL(id value1, id value2) {
+        NSComparisonResult result = [value1 compare:value2];
+        return result == NSOrderedAscending || result == NSOrderedSame;
+    } context:context];
 }
 
 @end

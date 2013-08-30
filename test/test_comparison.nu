@@ -28,6 +28,12 @@
         (assert_equal t (>= "c" "b" "b" "a"))
         (assert_equal nil (>= 3 2 1 2))
         (assert_equal nil (>= "a" "b")))
+
+    (- testNotEqual is 
+        (assert_equal t (!= 1 1 2))
+        (assert_equal nil (!= 1 1 1))
+    )
+        
      
      (- testCustomComparison is
         
