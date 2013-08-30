@@ -419,8 +419,6 @@ void NuInit(){
         // Their implementations are identical; this avoids code duplication.
         transplant_nu_methods([NSProxy class], [NSObject class]);
         
-        // swizzle container classes to allow us to add nil to collections (as NSNull).
-        nu_swizzleContainerClasses();
         
 #if !defined(MININUSH) && !TARGET_OS_IPHONE
         // Load some standard files
@@ -10069,65 +10067,6 @@ static NuProfiler *defaultProfiler = nil;
 }
 
 @end
-
-#pragma mark - NuSwizzles.m
-
-@interface NSCFDictionarySwizzles : NSObject
-@end
-
-@implementation NSCFDictionarySwizzles
-
-- (void)nuSetObject:(id)anObject forKey:(id)aKey{
-    [self nuSetObject:((anObject == nil) ? [NSNull NU_null] : anObject) forKey:aKey];
-}
-
-@end
-
-@interface NSCFArraySwizzles : NSObject
-@end
-
-@implementation NSCFArraySwizzles
-
-- (void)nuAddObject:(id)anObject{
-    [self nuAddObject:((anObject == nil) ? [NSNull NU_null] : anObject)];
-}
-
-- (void)nuInsertObject:(id)anObject atIndex:(int)index{
-    [self nuInsertObject:((anObject == nil) ? [NSNull NU_null] : anObject) atIndex:index];
-}
-
-- (void)nuReplaceObjectAtIndex:(int)index withObject:(id)anObject{
-    [self nuReplaceObjectAtIndex:index withObject:((anObject == nil) ? [NSNull NU_null] : anObject)];
-}
-
-@end
-
-@interface NSCFSetSwizzles : NSObject
-@end
-
-@implementation NSCFSetSwizzles
-
-- (void)nuAddObject:(id)anObject{
-    [self nuAddObject:((anObject == nil) ? [NSNull NU_null] : anObject)];
-}
-
-@end
-
-static void nu_swizzleContainerClasses(){
-    @autoreleasepool {
-        Class NSCFDictionary = NSClassFromString(@"NSCFDictionary");
-        Class NSCFArray = NSClassFromString(@"NSCFArray");
-        Class NSCFSet = NSClassFromString(@"NSCFSet");
-        [NSCFDictionary include:[NuClass classWithName:@"NSCFDictionarySwizzles"]];
-        [NSCFArray include:[NuClass classWithName:@"NSCFArraySwizzles"]];
-        [NSCFSet include:[NuClass classWithName:@"NSCFSetSwizzles"]];
-        [NSCFDictionary exchangeInstanceMethod:@selector(setObject:forKey:) withMethod:@selector(nuSetObject:forKey:)];
-        [NSCFArray exchangeInstanceMethod:@selector(addObject:) withMethod:@selector(nuAddObject:)];
-        [NSCFArray exchangeInstanceMethod:@selector(insertObject:atIndex:) withMethod:@selector(nuInsertObject:atIndex:)];
-        [NSCFArray exchangeInstanceMethod:@selector(replaceObjectAtIndex:withObject:) withMethod:@selector(nuReplaceObjectAtIndex:withObject:)];
-        [NSCFSet exchangeInstanceMethod:@selector(addObject:) withMethod:@selector(nuAddObject:)];
-    }
-}
 
 #pragma mark - NuSymbol.m
 
