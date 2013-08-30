@@ -550,11 +550,10 @@ id _nulist(id firstObject, ...){
 
 #pragma mark - NuBlock.m
 
-@interface NuBlock (){
-	NuCell *_parameters;
-    NuCell *_body;
-	NSMutableDictionary *_context;
-}
+@interface NuBlock ()
+@property (nonatomic, strong) NSMutableDictionary *context;
+@property (nonatomic, strong) NuCell *body;
+@property (nonatomic, strong) NuCell *parameters;
 @end
 
 @implementation NuBlock
@@ -767,18 +766,6 @@ static id getObjectFromContext(id context, id symbol){
     [value autorelease];
     [evaluation_context release];
     return value;
-}
-
-- (NSMutableDictionary *) context{
-    return _context;
-}
-
-- (NuCell *) parameters{
-    return _parameters;
-}
-
-- (NuCell *) body{
-    return _body;
 }
 
 @end
