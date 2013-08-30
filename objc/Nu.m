@@ -69,6 +69,7 @@
 
 #define IS_NOT_NULL(xyz) ((xyz) && (((id) (xyz)) != [NSNull null]))
 typedef BOOL(^NUCellPairBlock)(id value1, id value2);
+typedef id(^NUCellMapBlock)(id cell, NSMutableDictionary *context);
 // We'd like for this to be in the ObjC2 API, but it isn't.
 static void nu_class_addInstanceVariable_withSignature(Class thisClass, const char *variableName, const char *signature);
 
@@ -2810,7 +2811,8 @@ static NSString *getTypeStringFromNode(id node){
 @property (nonatomic) int line;
 - (id) allChainedPairs:(NUCellPairBlock) block context:(NSMutableDictionary *) context;
 - (id) eitherChainedPairs:(NUCellPairBlock) block context:(NSMutableDictionary *) context;
-    @end
+- (id) eachEvaluatedListInContext:(NSMutableDictionary *) context;
+@end
 
 @implementation NuCell
 
@@ -3042,6 +3044,34 @@ static NSString *getTypeStringFromNode(id node){
     
     return [context NU_false];
 }
+
+- (id) eachEvaluatedListInContext:(NSMutableDictionary *) context{
+    return [self map:^id(id cell, NSMutableDictionary *context) {
+        return [[cell car] evalWithContext:context];
+    } context:context];
+}
+
+- (id) map:(NUCellMapBlock) block context:(NSMutableDictionary *) context{
+    NuCell *evaluatedArguments = nil;
+    id cursor = self;
+    id outCursor = nil;
+    while (cursor && (cursor != [NSNull NU_null])) {
+        id nextValue = block(cursor, context);
+        id newCell = [[[NuCell alloc] init] autorelease];
+        [newCell setCar:nextValue];
+        if (!outCursor) {
+            evaluatedArguments = newCell;
+        }
+        else {
+            [outCursor setCdr:newCell];
+        }
+        outCursor = newCell;
+        cursor = [cursor cdr];
+    }
+    return evaluatedArguments;
+    
+}
+
 
 - (id) evalWithContext:(NSMutableDictionary *)context{
     id value = nil;
@@ -3967,6 +3997,11 @@ static BOOL NuException_verboseExceptionReporting = NO;
 - (const char *) cStringUsingEncoding:(NSStringEncoding) encoding{
     return [[self stringValue] cStringUsingEncoding:encoding];
 }
+
+- (id) eachEvaluatedListInContext:(NSMutableArray *) context{
+    return nil;
+}
+
 
 @end
 
@@ -8443,25 +8478,6 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 
 @end
 
-static id evaluatedArguments(id cdr, NSMutableDictionary *context){
-    NuCell *evaluatedArguments = nil;
-    id cursor = cdr;
-    id outCursor = nil;
-    while (cursor && (cursor != [NSNull NU_null])) {
-        id nextValue = [[cursor car] evalWithContext:context];
-        id newCell = [[[NuCell alloc] init] autorelease];
-        [newCell setCar:nextValue];
-        if (!outCursor) {
-            evaluatedArguments = newCell;
-        }
-        else {
-            [outCursor setCdr:newCell];
-        }
-        outCursor = newCell;
-        cursor = [cursor cdr];
-    }
-    return evaluatedArguments;
-}
 
 @interface Nu_array_operator : NuOperator
 @end
@@ -8469,7 +8485,7 @@ static id evaluatedArguments(id cdr, NSMutableDictionary *context){
 @implementation Nu_array_operator
 
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    return [NSArray arrayWithList:evaluatedArguments(cdr, context)];
+    return [NSArray arrayWithList:[cdr eachEvaluatedListInContext:context]];
 }
 
 @end
@@ -8480,7 +8496,7 @@ static id evaluatedArguments(id cdr, NSMutableDictionary *context){
 @implementation Nu_dict_operator
 
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    return [NSDictionary dictionaryWithList:evaluatedArguments(cdr, context)];
+    return [NSDictionary dictionaryWithList:[cdr eachEvaluatedListInContext:context]];
 }
 
 @end
