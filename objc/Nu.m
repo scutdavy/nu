@@ -10537,14 +10537,3 @@ static int deallocationCount = 0;
 }
 
 @end
-
-#import <Foundation/Foundation.h>
-#import "Nu.h"
-
-
-#ifdef NO_NU
-@interface NuOperator : NSObject
-- (id) evalWithArguments:(id) cdr context:(NSMutableDictionary *) context;
-- (id) callWithArguments:(id) cdr context:(NSMutableDictionary *) context;
-@end
-#endif
