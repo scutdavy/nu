@@ -489,9 +489,10 @@ id _nulist(id firstObject, ...){
 
 + (NuParser *) sharedParser{
     static NuParser *sharedParser = nil;
-    if (!sharedParser) {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
         sharedParser = [[NuParser alloc] init];
-    }
+    });
     return sharedParser;
 }
 
@@ -5929,8 +5930,10 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 
 + (NuSelectorCache *) sharedSelectorCache{
     static NuSelectorCache *sharedCache = nil;
-    if (!sharedCache)
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
         sharedCache = [[self alloc] init];
+    });
     return sharedCache;
 }
 
