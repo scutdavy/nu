@@ -2777,15 +2777,45 @@ static NSString *getTypeStringFromNode(id node){
 
 #pragma mark - NuCell.m
 
+@interface NuCellEnumerator : NSEnumerator
++ (instancetype) enumeratorWithCell:(NuCell *) cell;
+@end
+
+@interface NuCellEnumerator ()
+@property (nonatomic, strong) NuCell *cursor;
+@end
+
+@implementation NuCellEnumerator
++ (instancetype) enumeratorWithCell:(NuCell *)cell{
+    NuCellEnumerator *enumerator = [NuCellEnumerator new];
+    enumerator.cursor = cell;
+    return enumerator;
+}
+
+- (id) nextObject{
+    if (self.cursor == nil || self.cursor == [NSNull NU_null]) return nil;
+    id ret = self.cursor;
+    self.cursor = self.cursor.cdr;
+    return ret;
+}
+@end
+
+
+
 @interface NuCell ()
 @property (nonatomic) int file;
 @property (nonatomic) int line;
 - (id) allChainedPairs:(NUCellPairBlock) block context:(NSMutableDictionary *) context;
 - (id) eitherChainedPairs:(NUCellPairBlock) block context:(NSMutableDictionary *) context;
 - (id) eachEvaluatedListInContext:(NSMutableDictionary *) context;
+- (NuCellEnumerator *) enumerator;
 @end
 
 @implementation NuCell
+
+- (NuCellEnumerator *) enumerator{
+    return [NuCellEnumerator enumeratorWithCell:self];
+}
 
 + (id) cellWithCar:(id)car cdr:(id)cdr{
     NuCell *cell = [[self alloc] init];
@@ -2914,11 +2944,7 @@ static NSString *getTypeStringFromNode(id node){
 }
 
 - (id) lastObject{
-    id cursor = self;
-    while ([cursor cdr] != [NSNull NU_null]) {
-        cursor = [cursor cdr];
-    }
-    return [cursor car];
+    return [[[[self enumerator] allObjects] lastObject] car];
 }
 
 - (NSMutableString *) stringValue{
@@ -3040,7 +3066,6 @@ static NSString *getTypeStringFromNode(id node){
         cursor = [cursor cdr];
     }
     return evaluatedArguments;
-    
 }
 
 
