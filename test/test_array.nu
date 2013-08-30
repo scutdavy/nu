@@ -7,10 +7,8 @@
  
  (- testCreate is
     (set a (NSMutableArray arrayWithList:'(1 2)))
-    (a << "three")
-    (assert_equal 3 (a count))
-    (assert_equal 2 (a 1))
-    (assert_equal "three" (a 2)))
+    (assert_equal 2 (a count))
+    (assert_equal 2 (a 1)))
  
  (- testEach is
     (set i 0)

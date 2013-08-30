@@ -400,21 +400,6 @@ void NuInit(){
         [NSSet include: [NuClass classWithClass:[NuEnumerable class]]];
         [NSString include: [NuClass classWithClass:[NuEnumerable class]]];
         
-        // create "<<" messages that append their arguments to arrays, sets, and strings
-        id parser = [Nu sharedParser];
-        [[NuClass classWithClass:[NSMutableArray class]]
-         addInstanceMethod:@"<<"
-         signature:@"v*"
-         body:[parser eval:[parser parse:@"(do (value) (self addObject:value))"]]];
-        [[NuClass classWithClass:[NSMutableSet class]]
-         addInstanceMethod:@"<<"
-         signature:@"v*"
-         body:[parser eval:[parser parse:@"(do (value) (self addObject:value))"]]];
-        [[NuClass classWithClass:[NSMutableString class]]
-         addInstanceMethod:@"<<"
-         signature:@"v*"
-         body:[parser eval:[parser parse:@"(do (object) (self appendString:(object stringValue)))"]]];
-        
         // Copy some useful methods from NSObject to NSProxy.
         // Their implementations are identical; this avoids code duplication.
         transplant_nu_methods([NSProxy class], [NSObject class]);
