@@ -3555,9 +3555,7 @@ static NSString *getTypeStringFromNode(id node){
 - (id) each:(id) callable{
     id args = [[NuCell alloc] init];
     if ([callable respondsToSelector:@selector(evalWithArguments:context:)]) {
-        NSEnumerator *enumerator = [self objectEnumerator];
-        id object;
-        while ((object = [enumerator nextObject])) {
+        for (id object in [self objectEnumerator]) {
             @try
             {
                 [args setCar:object];
@@ -3573,6 +3571,7 @@ static NSString *getTypeStringFromNode(id node){
                 [args release];
                 @throw(exception);
             }
+            
         }
     }
     [args release];
@@ -3583,10 +3582,8 @@ static NSString *getTypeStringFromNode(id node){
     id args = [[NuCell alloc] init];
     [args setCdr:[[[NuCell alloc] init] autorelease]];
     if (nu_objectIsKindOfClass(block, [NuBlock class])) {
-        NSEnumerator *enumerator = [self objectEnumerator];
-        id object;
         int i = 0;
-        while ((object = [enumerator nextObject])) {
+        for (id object in [self objectEnumerator]) {
             @try
             {
                 [args setCar:object];
@@ -3612,9 +3609,7 @@ static NSString *getTypeStringFromNode(id node){
 
 - (NSArray *) select{
     NSMutableArray *selected = [NSMutableArray array];
-    NSEnumerator *enumerator = [self objectEnumerator];
-    id object;
-    while ((object = [enumerator nextObject])) {
+    for (id object in [self objectEnumerator]) {
         if (nu_valueIsTrue(object)) {
             [selected addObject:object];
         }
@@ -3626,9 +3621,7 @@ static NSString *getTypeStringFromNode(id node){
     NSMutableArray *selected = [NSMutableArray array];
     id args = [[NuCell alloc] init];
     if (nu_objectIsKindOfClass(block, [NuBlock class])) {
-        NSEnumerator *enumerator = [self objectEnumerator];
-        id object;
-        while ((object = [enumerator nextObject])) {
+        for (id object in [self objectEnumerator]) {
             [args setCar:object];
             id result = [block evalWithArguments:args context:[NSNull NU_null]];
             if (nu_valueIsTrue(result)) {
@@ -3643,9 +3636,7 @@ static NSString *getTypeStringFromNode(id node){
 - (id) find:(NuBlock *) block{
     id args = [[NuCell alloc] init];
     if (nu_objectIsKindOfClass(block, [NuBlock class])) {
-        NSEnumerator *enumerator = [self objectEnumerator];
-        id object;
-        while ((object = [enumerator nextObject])) {
+        for (id object in [self objectEnumerator]) {
             [args setCar:object];
             id result = [block evalWithArguments:args context:[NSNull NU_null]];
             if (nu_valueIsTrue(result)) {
@@ -3662,9 +3653,7 @@ static NSString *getTypeStringFromNode(id node){
     NSMutableArray *results = [NSMutableArray array];
     id args = [[NuCell alloc] init];
     if ([callable respondsToSelector:@selector(evalWithArguments:context:)]) {
-        NSEnumerator *enumerator = [self objectEnumerator];
-        id object;
-        while ((object = [enumerator nextObject])) {
+        for (id object in [self objectEnumerator]) {
             [args setCar:object];
             [results addObject:[callable evalWithArguments:args context:nil]];
         }
@@ -3678,10 +3667,8 @@ static NSString *getTypeStringFromNode(id node){
     id args = [[NuCell alloc] init];
     [args setCdr:[[[NuCell alloc] init] autorelease]];
     if ([callable respondsToSelector:@selector(evalWithArguments:context:)]) {
-        NSEnumerator *enumerator = [self objectEnumerator];
-        id object;
         int i = 0;
-        while ((object = [enumerator nextObject])) {
+        for (id object in [self objectEnumerator]) {
             [args setCar:object];
             [[args cdr] setCar:[NSNumber numberWithInt:i]];
             [results addObject:[callable evalWithArguments:args context:nil]];
@@ -3694,10 +3681,7 @@ static NSString *getTypeStringFromNode(id node){
 
 - (NSArray *) mapSelector:(SEL) sel{
     NSMutableArray *results = [NSMutableArray array];
-    NSEnumerator *enumerator = [self objectEnumerator];
-    id object;
-    while ((object = [enumerator nextObject])) {
-        // this will fail (crash!) if the selector returns any type other than an object.
+    for (id object in [self objectEnumerator]) {
         [results addObject:[object performSelector:sel]];
     }
     return results;
@@ -3708,9 +3692,7 @@ static NSString *getTypeStringFromNode(id node){
     [args setCdr:[[[NuCell alloc] init] autorelease]];
     id result = initial;
     if ([callable respondsToSelector:@selector(evalWithArguments:context:)]) {
-        NSEnumerator *enumerator = [self objectEnumerator];
-        id object;
-        while ((object = [enumerator nextObject])) {
+        for (id object in [self objectEnumerator]) {
             [args setCar:result];
             [[args cdr] setCar: object];
             result = [callable evalWithArguments:args context:nil];
@@ -3727,9 +3709,7 @@ static NSString *getTypeStringFromNode(id node){
     [args setCdr:[[[NuCell alloc] init] autorelease]];
     
     if (nu_objectIsKindOfClass(block, [NuBlock class])) {
-        NSEnumerator *enumerator = [self objectEnumerator];
-        id object;
-        while ((object = [enumerator nextObject])) {
+        for (id object in [self objectEnumerator]) {
             if (!bestObject) {
                 bestObject = object;
             }
@@ -3964,13 +3944,7 @@ static BOOL NuException_verboseExceptionReporting = NO;
 
 @implementation NSArray(Nu)
 + (NSArray *) arrayWithList:(id) list{
-    NSMutableArray *a = [NSMutableArray array];
-    id cursor = list;
-    while (cursor && cursor != [NSNull NU_null]) {
-        [a addObject:[cursor car]];
-        cursor = [cursor cdr];
-    }
-    return a;
+    return [[list array] mutableCopy] ?: [NSMutableArray array];
 }
 
 // When an unknown message is received by an array, treat it as a call to objectAtIndex:
@@ -4034,9 +4008,7 @@ static BOOL NuException_verboseExceptionReporting = NO;
 - (id) eachInReverse:(id) callable{
     id args = [[NuCell alloc] init];
     if ([callable respondsToSelector:@selector(evalWithArguments:context:)]) {
-        NSEnumerator *enumerator = [self reverseObjectEnumerator];
-        id object;
-        while ((object = [enumerator nextObject])) {
+        for (id object in [self reverseObjectEnumerator]) {
             @try
             {
                 [args setCar:object];
@@ -4103,13 +4075,8 @@ static NSComparisonResult sortedArrayUsingBlockHelper(id a, id b, void *context)
 
 @implementation NSSet(Nu)
 + (NSSet *) setWithList:(id) list{
-    NSMutableSet *s = [NSMutableSet set];
-    id cursor = list;
-    while (cursor && cursor != [NSNull NU_null]) {
-        [s addObject:[cursor car]];
-        cursor = [cursor cdr];
-    }
-    return s;
+    NSArray *array = [list array] ?: [NSMutableArray array];
+    return [[NSSet setWithArray:array] mutableCopy];
 }
 
 // Convert a set into a list.
@@ -4206,9 +4173,7 @@ static NSComparisonResult sortedArrayUsingBlockHelper(id a, id b, void *context)
 - (id) each:(id) block{
     id args = [[NuCell alloc] init];
     [args setCdr:[[[NuCell alloc] init] autorelease]];
-    NSEnumerator *keyEnumerator = [[self allKeys] objectEnumerator];
-    id key;
-    while ((key = [keyEnumerator nextObject])) {
+    for (id key in [[self allKeys] objectEnumerator]) {
         @try
         {
             [args setCar:key];
@@ -4233,9 +4198,7 @@ static NSComparisonResult sortedArrayUsingBlockHelper(id a, id b, void *context)
     NSMutableDictionary *results = [NSMutableDictionary dictionary];
     id args = [[NuCell alloc] init];
     if ([callable respondsToSelector:@selector(evalWithArguments:context:)]) {
-        NSEnumerator *enumerator = [self keyEnumerator];
-        id object;
-        while ((object = [enumerator nextObject])) {
+        for (id object in [self keyEnumerator]) {
             [args setCar:object];
             [args setCdr:[[[NuCell alloc] init] autorelease]];
             [[args cdr] setCar:[self objectForKey:object]];
