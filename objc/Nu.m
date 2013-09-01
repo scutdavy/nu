@@ -2887,28 +2887,16 @@ static NSString *getTypeStringFromNode(id node){
 }
 
 - (id) nth:(int) n{
-    if (n == 1)
-        return _car;
-    id cursor = _cdr;
-    int i;
-    for (i = 2; i < n; i++) {
-        cursor = [cursor cdr];
-        if (cursor == [NSNull NU_null]) return nil;
-    }
-    return [cursor car];
+    return [self objectAtIndex:n];
 }
 
 - (id) objectAtIndex:(int) n{
-    if (n < 0)
-        return nil;
-    else if (n == 0)
-        return _car;
-    id cursor = _cdr;
-    for (int i = 1; i < n; i++) {
-        cursor = [cursor cdr];
-        if (cursor == [NSNull NU_null]) return nil;
-    }
-    return [cursor car];
+    if (n < 0) return nil;
+    
+    NSArray *cells = [[self enumerator] allObjects];
+    if ([cells count] <= n) return nil;
+    
+    return [[cells objectAtIndex:n] car];
 }
 
 // When an unknown message is received by a cell, treat it as a call to objectAtIndex:
@@ -3006,18 +2994,17 @@ static NSString *getTypeStringFromNode(id node){
 
 - (id) allChainedPairs:(NUCellPairBlock) block context:(NSMutableDictionary *) context{
     NSParameterAssert(block);
-    id cursor = self;
-    NSParameterAssert([cursor cdr]);
-    id current = [[cursor car] evalWithContext:context];
+    NSParameterAssert([self cdr]);
+    id current = [[self car] evalWithContext:context];
     
-    while (cursor && (cursor != [NSNull NU_null]) &&
-           [cursor cdr] && [cursor cdr] != [NSNull NU_null]) {
+    for (id cursor in [self enumerator]) {
+        if ([cursor cdr] == nil || [cursor cdr] == [NSNull NU_null]) break;
+        
         id next = [[[cursor cdr] car] evalWithContext:context];
         if (!block(current, next)) {
             return [context NU_false];
         }
         current = next;
-        cursor = [cursor cdr];
     }
 
     return [context NU_true];
@@ -3025,18 +3012,17 @@ static NSString *getTypeStringFromNode(id node){
 
 - (id) eitherChainedPairs:(NUCellPairBlock) block context:(NSMutableDictionary *) context{
     NSParameterAssert(block);
-    id cursor = self;
-    NSParameterAssert([cursor cdr]);
-    id current = [[cursor car] evalWithContext:context];
+    NSParameterAssert([self cdr]);
+    id current = [[self car] evalWithContext:context];
     
-    while (cursor && (cursor != [NSNull NU_null]) &&
-           [cursor cdr] && [cursor cdr] != [NSNull NU_null]) {
+    for (id cursor in [self enumerator]) {
+        if ([cursor cdr] == nil || [cursor cdr] == [NSNull NU_null]) break;
+        
         id next = [[[cursor cdr] car] evalWithContext:context];
         if (block(current, next)) {
             return [context NU_true];
         }
         current = next;
-        cursor = [cursor cdr];
     }
     
     return [context NU_false];
@@ -3050,9 +3036,9 @@ static NSString *getTypeStringFromNode(id node){
 
 - (id) map:(NUCellMapBlock) block context:(NSMutableDictionary *) context{
     NuCell *evaluatedArguments = nil;
-    id cursor = self;
     id outCursor = nil;
-    while (cursor && (cursor != [NSNull NU_null])) {
+    
+    for (id cursor in [self enumerator]) {
         id nextValue = block(cursor, context);
         id newCell = [[[NuCell alloc] init] autorelease];
         [newCell setCar:nextValue];
@@ -3063,8 +3049,8 @@ static NSString *getTypeStringFromNode(id node){
             [outCursor setCdr:newCell];
         }
         outCursor = newCell;
-        cursor = [cursor cdr];
     }
+    
     return evaluatedArguments;
 }
 
@@ -3124,11 +3110,9 @@ static NSString *getTypeStringFromNode(id node){
 - (id) each:(id) block{
     if (nu_objectIsKindOfClass(block, [NuBlock class])) {
         id args = [[NuCell alloc] init];
-        id cursor = self;
-        while (cursor && (cursor != [NSNull NU_null])) {
+        for (id cursor in [self enumerator]) {
             [args setCar:[cursor car]];
             [block evalWithArguments:args context:[NSNull NU_null]];
-            cursor = [cursor cdr];
         }
         [args release];
     }
@@ -3139,12 +3123,10 @@ static NSString *getTypeStringFromNode(id node){
     if (nu_objectIsKindOfClass(block, [NuBlock class])) {
         id args = [[NuCell alloc] init];
         [args setCdr:[[[NuCell alloc] init] autorelease]];
-        id cursor = self;
-        while (cursor && (cursor != [NSNull NU_null])) {
+        for (id cursor in [self enumerator]) {
             [args setCar:[cursor car]];
             [[args cdr] setCar:[[cursor cdr] car]];
             [block evalWithArguments:args context:[NSNull NU_null]];
-            cursor = [[cursor cdr] cdr];
         }
         [args release];
     }
@@ -3155,13 +3137,12 @@ static NSString *getTypeStringFromNode(id node){
     if (nu_objectIsKindOfClass(block, [NuBlock class])) {
         id args = [[NuCell alloc] init];
         [args setCdr:[[[NuCell alloc] init] autorelease]];
-        id cursor = self;
         int i = 0;
-        while (cursor && (cursor != [NSNull NU_null])) {
+        
+        for (id cursor in [self enumerator]) {
             [args setCar:[cursor car]];
             [[args cdr] setCar:[NSNumber numberWithInt:i]];
             [block evalWithArguments:args context:[NSNull NU_null]];
-            cursor = [cursor cdr];
             i++;
         }
         [args release];
@@ -3173,16 +3154,15 @@ static NSString *getTypeStringFromNode(id node){
     NuCell *parent = [[[NuCell alloc] init] autorelease];
     if (nu_objectIsKindOfClass(block, [NuBlock class])) {
         id args = [[NuCell alloc] init];
-        id cursor = self;
         id resultCursor = parent;
-        while (cursor && (cursor != [NSNull NU_null])) {
+        
+        for (id cursor in [self enumerator]) {
             [args setCar:[cursor car]];
             id result = [block evalWithArguments:args context:[NSNull NU_null]];
             if (nu_valueIsTrue(result)) {
                 [resultCursor setCdr:[NuCell cellWithCar:[cursor car] cdr:[resultCursor cdr]]];
                 resultCursor = [resultCursor cdr];
             }
-            cursor = [cursor cdr];
         }
         [args release];
     }
@@ -3195,15 +3175,14 @@ static NSString *getTypeStringFromNode(id node){
 - (id) find:(id) block{
     if (nu_objectIsKindOfClass(block, [NuBlock class])) {
         id args = [[NuCell alloc] init];
-        id cursor = self;
-        while (cursor && (cursor != [NSNull NU_null])) {
+        
+        for (id cursor in [self enumerator]) {
             [args setCar:[cursor car]];
             id result = [block evalWithArguments:args context:[NSNull NU_null]];
             if (nu_valueIsTrue(result)) {
                 [args release];
                 return [cursor car];
             }
-            cursor = [cursor cdr];
         }
         [args release];
     }
@@ -3214,13 +3193,11 @@ static NSString *getTypeStringFromNode(id node){
     NuCell *parent = [[[NuCell alloc] init] autorelease];
     if (nu_objectIsKindOfClass(block, [NuBlock class])) {
         id args = [[NuCell alloc] init];
-        id cursor = self;
         id resultCursor = parent;
-        while (cursor && (cursor != [NSNull NU_null])) {
+        for (id cursor in [self enumerator]) {
             [args setCar:[cursor car]];
             id result = [block evalWithArguments:args context:[NSNull NU_null]];
             [resultCursor setCdr:[NuCell cellWithCar:result cdr:[resultCursor cdr]]];
-            cursor = [cursor cdr];
             resultCursor = [resultCursor cdr];
         }
         [args release];
@@ -3234,13 +3211,11 @@ static NSString *getTypeStringFromNode(id node){
 - (id) mapSelector:(SEL) sel{
     NuCell *parent = [[NuCell alloc] init];
     id args = [[NuCell alloc] init];
-    id cursor = self;
     id resultCursor = parent;
-    while (cursor && (cursor != [NSNull NU_null])) {
+    for (id cursor in [self enumerator]) {
         id object = [cursor car];
         id result = [object performSelector:sel];
         [resultCursor setCdr:[NuCell cellWithCar:result cdr:[resultCursor cdr]]];
-        cursor = [cursor cdr];
         resultCursor = [resultCursor cdr];
     }
     [args release];
@@ -3254,12 +3229,10 @@ static NSString *getTypeStringFromNode(id node){
     if (nu_objectIsKindOfClass(block, [NuBlock class])) {
         id args = [[NuCell alloc] init];
         [args setCdr:[[[NuCell alloc] init] autorelease]];
-        id cursor = self;
-        while (cursor && (cursor != [NSNull NU_null])) {
+        for (id cursor in [self enumerator]) {
             [args setCar:result];
             [[args cdr] setCar:[cursor car]];
             result = [block evalWithArguments:args context:[NSNull NU_null]];
-            cursor = [cursor cdr];
         }
         [args release];
     }
@@ -3267,23 +3240,11 @@ static NSString *getTypeStringFromNode(id node){
 }
 
 - (NSUInteger) length{
-    int count = 0;
-    id cursor = self;
-    while (cursor && (cursor != [NSNull NU_null])) {
-        cursor = [cursor cdr];
-        count++;
-    }
-    return count;
+    return [[[self enumerator] allObjects] count];
 }
 
 - (NSMutableArray *) array{
-    NSMutableArray *a = [NSMutableArray array];
-    id cursor = self;
-    while (cursor && cursor != [NSNull NU_null]) {
-        [a addObject:[cursor car]];
-        cursor = [cursor cdr];
-    }
-    return a;
+    return [[[self enumerator] allObjects] valueForKey:@"car"];
 }
 
 - (NSUInteger) count{
