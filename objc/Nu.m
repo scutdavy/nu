@@ -6572,11 +6572,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
     id cadr = [cdr car];
     id value = [cadr evalWithContext:context];
-    NuSymbolTable *symbolTable = [context objectForKey:SYMBOLS_KEY];
-    if ([value atom])
-        return [symbolTable symbolWithString:@"t"];
-    else
-        return [NSNull NU_null];
+    return [value atom]? [context NU_true]: [context NU_false];
 }
 
 @end
@@ -6602,11 +6598,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
             @throw(exception);
         }
     }
-    NuSymbolTable *symbolTable = [context objectForKey:SYMBOLS_KEY];
-    if (is_defined)
-        return [symbolTable symbolWithString:@"t"];
-    else
-        return [NSNull NU_null];
+    return is_defined? [context NU_true]: [NSNull NU_null];
 }
 
 @end
@@ -7357,7 +7349,6 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
     [context setPossiblyNullObject:result forKey:symbol];
     return result;
 }
-
 @end
 
 
@@ -7498,23 +7489,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 
 @implementation Nu_list_operator
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    id result = [NSNull NU_null];
-    id cursor = cdr;
-    id result_cursor = [NSNull NU_null];
-    while (cursor && (cursor != [NSNull NU_null])) {
-        if (result == [NSNull NU_null]) {
-            result = [[[NuCell alloc] init] autorelease];
-            result_cursor = result;
-        }
-        else {
-            [result_cursor setCdr:[[[NuCell alloc] init] autorelease]];
-            result_cursor = [result_cursor cdr];
-        }
-        id value = [[cursor car] evalWithContext:context];
-        [result_cursor setCar:value];
-        cursor = [cursor cdr];
-    }
-    return result;
+    return [cdr eachEvaluatedListInContext:context];
 }
 
 @end
@@ -7579,25 +7554,17 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
         Class classToExtend = [classWrapper wrappedClass];
         return help_add_method_to_class(classToExtend, cdr, context, NO);
     }
-    // otherwise, it's a subtraction
-    id cursor = cdr;
-    double sum = [[[cursor car] evalWithContext:context] doubleValue];
-    cursor = [cursor cdr];
-    if (!cursor || (cursor == [NSNull NU_null])) {
-        // if there is just one operand, negate it
-        sum = -sum;
+
+    
+    double sum = [[[cdr car] evalWithContext:context] doubleValue];
+    if ([cdr cdr] == nil || [cdr cdr] == [NSNull NU_null]) {
+        return @(-sum);
     }
-    else {
-        // otherwise, subtract all the remaining operands from the first one
-        while (cursor && (cursor != [NSNull NU_null])) {
-            sum -= [[[cursor car] evalWithContext:context] doubleValue];
-            cursor = [cursor cdr];
-        }
+    
+    for (id cursor in [[cdr cdr] cellEnumerator]) {
+        sum -= [[[cursor car] evalWithContext:context] doubleValue];
     }
     return [NSNumber numberWithDouble:sum];
-//    return [cdr reduce:^id(id sum, id obj, NSMutableDictionary *context) {
-//        return @([sum doubleValue] - [[obj evalWithContext:context] doubleValue]);
-//    } initial:@0 context:context];
 }
 
 @end
@@ -7624,14 +7591,11 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 
 @implementation Nu_divide_operator
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    id cursor = cdr;
-    double product = [[[cursor car] evalWithContext:context] doubleValue];
-    cursor = [cursor cdr];
-    while (cursor && (cursor != [NSNull NU_null])) {
+    double product = [[[cdr car] evalWithContext:context] doubleValue];
+    for (id cursor in [[cdr cdr] cellEnumerator]) {
         product /= [[[cursor car] evalWithContext:context] doubleValue];
-        cursor = [cursor cdr];
     }
-    return [NSNumber numberWithDouble:product];
+    return @(product);
 }
 
 @end
@@ -7641,12 +7605,9 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 
 @implementation Nu_modulus_operator
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    id cursor = cdr;
-    int product = [[[cursor car] evalWithContext:context] intValue];
-    cursor = [cursor cdr];
-    while (cursor && (cursor != [NSNull NU_null])) {
+    int product = [[[cdr car] evalWithContext:context] intValue];
+    for (id cursor in [[cdr cdr] cellEnumerator]) {
         product %= [[[cursor car] evalWithContext:context] intValue];
-        cursor = [cursor cdr];
     }
     return [NSNumber numberWithInt:product];
 }
@@ -7658,12 +7619,9 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 
 @implementation Nu_bitwiseand_operator
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    id cursor = cdr;
-    long result = [[[cursor car] evalWithContext:context] longValue];
-    cursor = [cursor cdr];
-    while (cursor && (cursor != [NSNull NU_null])) {
-        result &= [[[cursor car] evalWithContext:context] longValue];
-        cursor = [cursor cdr];
+    long result = [[[cdr car] evalWithContext:context] longValue];
+    for (id cursor in [[cdr cdr] cellEnumerator]) {
+         result &= [[[cursor car] evalWithContext:context] longValue];
     }
     return [NSNumber numberWithLong:result];
 }
@@ -7675,12 +7633,9 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 
 @implementation Nu_bitwiseor_operator
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    id cursor = cdr;
-    long result = [[[cursor car] evalWithContext:context] longValue];
-    cursor = [cursor cdr];
-    while (cursor && (cursor != [NSNull NU_null])) {
+    long result = [[[cdr car] evalWithContext:context] longValue];
+    for (id cursor in [[cdr cdr] cellEnumerator]) {
         result |= [[[cursor car] evalWithContext:context] longValue];
-        cursor = [cursor cdr];
     }
     return [NSNumber numberWithLong:result];
 }
@@ -7766,13 +7721,10 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 
 @implementation Nu_and_operator
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    id cursor = cdr;
     id value = [NSNull NU_null];
-    while (cursor && (cursor != [NSNull NU_null])) {
+    for (id cursor in [cdr cellEnumerator]) {
         value = [[cursor car] evalWithContext:context];
-        if (!nu_valueIsTrue(value))
-            return [NSNull NU_null];
-        cursor = [cursor cdr];
+        if (!nu_valueIsTrue(value)) return [NSNull NU_null];
     }
     return value;
 }
@@ -7784,12 +7736,9 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 
 @implementation Nu_or_operator
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    id cursor = cdr;
-    while (cursor && (cursor != [NSNull NU_null])) {
+    for (id cursor in [cdr cellEnumerator]) {
         id value = [[cursor car] evalWithContext:context];
-        if (nu_valueIsTrue(value))
-            return value;
-        cursor = [cursor cdr];
+        if (nu_valueIsTrue(value)) return value;
     }
     return [NSNull NU_null];
 }
@@ -7828,12 +7777,10 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
     NuConsoleViewController *console = (NuConsoleViewController*)
     [[symbolTable symbolWithString:@"$$console"] value];
 #endif
-    NSString *string;
-    id cursor = cdr;
-    while (cursor && (cursor != [NSNull NU_null])) {
+    for (id cursor in [cdr cellEnumerator]) {
         id value = [[cursor car] evalWithContext:context];
         if (value) {
-            string = [value stringValue];
+            NSString *string = [value stringValue];
 #if !TARGET_OS_IPHONE
             if (console && (console != [NSNull NU_null])) {
                 [console write:string];
@@ -7846,7 +7793,6 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
             }
 #endif
         }
-        cursor = [cursor cdr];
     }
     return [NSNull NU_null];;
 }
@@ -7876,10 +7822,8 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
     NuSymbolTable *symbolTable = [context objectForKey:SYMBOLS_KEY];
     NuConsoleViewController *console = (NuConsoleViewController*)[[symbolTable symbolWithString:@"$$console"] value];
 #endif
-    NSString *string;
-    id cursor = cdr;
-    while (cursor && (cursor != [NSNull NU_null])) {
-        string = [[[cursor car] evalWithContext:context] stringValue];
+    for (id cursor in [cdr cellEnumerator]) {
+        NSString *string = [[[cursor car] evalWithContext:context] stringValue];
 #if !TARGET_OS_IPHONE
         if (console && (console != [NSNull NU_null])) {
             [console write:string];
@@ -7890,7 +7834,6 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 #if !TARGET_OS_IPHONE
         }
 #endif
-        cursor = [cursor cdr];
     }
     return [NSNull NU_null];;
 }
@@ -7929,10 +7872,8 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 @implementation Nu_progn_operator
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
     id value = [NSNull NU_null];
-    id cursor = cdr;
-    while (cursor && (cursor != [NSNull NU_null])) {
+    for (id cursor in [cdr cellEnumerator]) {
         value = [[cursor car] evalWithContext:context];
-        cursor = [cursor cdr];
     }
     return value;
 }
@@ -8178,12 +8119,11 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 
 @implementation Nu_system_operator
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    id cursor = cdr;
-    NSMutableString *command = [NSMutableString string];
-    while (cursor && (cursor != [NSNull null])) {
-        [command appendString:[[[cursor car] evalWithContext:context] stringValue]];
-        cursor = [cursor cdr];
-    }
+    NSString *command = [cdr reduce:^id(id sum, id obj, NSMutableDictionary *context) {
+        [sum appendString:obj];
+        return sum;
+    } initial:[NSMutableString string] context:context];
+
     const char *commandString = [command cStringUsingEncoding:NSUTF8StringEncoding];
     int result = system(commandString) >> 8;      // this needs an explanation
     return [NSNumber numberWithInt:result];
@@ -8341,17 +8281,16 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 @implementation Nu_min_operator
 
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    if (cdr == [NSNull NU_null])
-        [NSException raise: @"NuArityError" format:@"min expects at least 1 argument, got 0"];
+    if (cdr == [NSNull NU_null]) [NSException raise: @"NuArityError" format:@"min expects at least 1 argument, got 0"];
+    
     id smallest = [[cdr car] evalWithContext:context];
-    id cursor = [cdr cdr];
-    while (cursor && (cursor != [NSNull NU_null])) {
+    for (id cursor in [[cdr cdr] cellEnumerator]) {
         id nextValue = [[cursor car] evalWithContext:context];
         if([smallest compare:nextValue] == 1) {
             smallest = nextValue;
         }
-        cursor = [cursor cdr];
     }
+    
     return smallest;
 }
 
@@ -8363,16 +8302,14 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 @implementation Nu_max_operator
 
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    if (cdr == [NSNull NU_null])
-        [NSException raise: @"NuArityError" format:@"max expects at least 1 argument, got 0"];
+    if (cdr == [NSNull NU_null]) [NSException raise: @"NuArityError" format:@"max expects at least 1 argument, got 0"];
+    
     id biggest = [[cdr car] evalWithContext:context];
-    id cursor = [cdr cdr];
-    while (cursor && (cursor != [NSNull NU_null])) {
+    for (id cursor in [[cdr cdr] cellEnumerator]) {
         id nextValue = [[cursor car] evalWithContext:context];
-        if([biggest compare:nextValue] == -1) {
+        if([biggest compare:nextValue] == NSOrderedAscending) {
             biggest = nextValue;
         }
-        cursor = [cursor cdr];
     }
     return biggest;
 }
