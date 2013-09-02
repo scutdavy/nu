@@ -3926,6 +3926,9 @@ static BOOL NuException_verboseExceptionReporting = NO;
     return nil;
 }
 
+- (id) cellEnumerator{
+    return nil;
+}
 
 @end
 
@@ -6750,21 +6753,17 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 
 @implementation Nu_cond_operator
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    id pairs = cdr;
     id value = [NSNull NU_null];
-    while (pairs != [NSNull NU_null]) {
+    for (id pairs in [cdr cellEnumerator]) {
         id condition = [[pairs car] car];
         id test = [condition evalWithContext:context];
         if (nu_valueIsTrue(test)) {
             value = test;
-            id cursor = [[pairs car] cdr];
-            while (cursor && (cursor != [NSNull NU_null])) {
+            for (id cursor in [[[pairs car] cdr] cellEnumerator]) {
                 value = [[cursor car] evalWithContext:context];
-                cursor = [cursor cdr];
             }
             return value;
         }
-        pairs = [pairs cdr];
     }
     return value;
 }
