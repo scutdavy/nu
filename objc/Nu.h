@@ -147,12 +147,7 @@
  Comments can then be parsed with Nu code, typically to produce documentation.
  */
 @interface NuCellWithComments : NuCell
-
-/*! Get a string containing the comments that preceded a list element. */
-- (id) comments;
-/*! Set the comments string for a list element. */
-- (void) setComments:(id) comments;
-
+@property (nonatomic, copy) id comments;
 @end
 
 #pragma mark -

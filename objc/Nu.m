@@ -3269,26 +3269,14 @@ static NSString *getTypeStringFromNode(id node){
 
 @end
 
-@interface NuCellWithComments (){
-    id _comments;
-}
+@interface NuCellWithComments ()
 @end
 
 @implementation NuCellWithComments
-
 - (void) dealloc{
     [_comments release];
     [super dealloc];
 }
-
-- (id) comments {return _comments;}
-
-- (void) setComments:(id) c{
-    [c retain];
-    [_comments release];
-    _comments = c;
-}
-
 @end
 
 #pragma mark - NuClass.m
