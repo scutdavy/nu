@@ -2813,6 +2813,7 @@ static NSString *getTypeStringFromNode(id node){
 
 - (id) reduce:(NUAccumulationBlock) block initial:(id) initial context:(NSMutableDictionary *) context;
 - (id) map:(NUCellMapBlock) block context:(NSMutableDictionary *) context;
+- (id) evalAsPrognInContext:(NSMutableDictionary *) context;
 @end
 
 @implementation NuCell
@@ -3030,6 +3031,14 @@ static NSString *getTypeStringFromNode(id node){
     }
     
     return [context NU_false];
+}
+
+- (id) evalAsPrognInContext:(NSMutableDictionary *) context{
+    id value = [NSNull NU_null];
+    for (id cursor in [self cellEnumerator]) {
+        value = [[cursor car] evalWithContext:context];
+    }
+    return value;
 }
 
 - (id) eachEvaluatedListInContext:(NSMutableDictionary *) context{
@@ -3927,6 +3936,10 @@ static BOOL NuException_verboseExceptionReporting = NO;
 }
 
 - (id) cellEnumerator{
+    return nil;
+}
+
+- (id) evalAsPrognInContext:(NSMutableDictionary *) context{
     return nil;
 }
 
@@ -6758,11 +6771,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
         id condition = [[pairs car] car];
         id test = [condition evalWithContext:context];
         if (nu_valueIsTrue(test)) {
-            value = test;
-            for (id cursor in [[[pairs car] cdr] cellEnumerator]) {
-                value = [[cursor car] evalWithContext:context];
-            }
-            return value;
+            return [[[pairs car] cdr] evalAsPrognInContext:context] ?: test;
         }
     }
     return value;
@@ -6781,24 +6790,12 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
         id condition = [[cases car] car];
         id result = [condition evalWithContext:context];
         if ([result isEqual:target]) {
-            id value = [NSNull NU_null];
-            id cursor = [[cases car] cdr];
-            while (cursor && (cursor != [NSNull NU_null])) {
-                value = [[cursor car] evalWithContext:context];
-                cursor = [cursor cdr];
-            }
-            return value;
+            return [[[cases car] cdr] evalAsPrognInContext:context];
         }
         cases = [cases cdr];
     }
     // or return the last one
-    id value = [NSNull NU_null];
-    id cursor = [[cases car] cdr];
-    while (cursor && (cursor != [NSNull NU_null])) {
-        value = [[cursor car] evalWithContext:context];
-        cursor = [cursor cdr];
-    }
-    return value;
+    return [[[cases car] cdr] evalAsPrognInContext:context];
 }
 
 @end
@@ -6891,10 +6888,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
         @try
         {
             id expressions = [cdr cdr];
-            while (expressions && (expressions != [NSNull NU_null])) {
-                result = [[expressions car] evalWithContext:context];
-                expressions = [expressions cdr];
-            }
+            result = [expressions evalAsPrognInContext:context];
         }
         @catch (NuBreakException *exception) {
             break;
@@ -6923,10 +6917,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
         @try
         {
             id expressions = [cdr cdr];
-            while (expressions && (expressions != [NSNull NU_null])) {
-                result = [[expressions car] evalWithContext:context];
-                expressions = [expressions cdr];
-            }
+            result = [expressions evalAsPrognInContext:context];
         }
         @catch (NuBreakException *exception) {
             break;
@@ -6962,10 +6953,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
         @try
         {
             id expressions = [cdr cdr];
-            while (expressions && (expressions != [NSNull NU_null])) {
-                result = [[expressions car] evalWithContext:context];
-                expressions = [expressions cdr];
-            }
+            result = [expressions evalAsPrognInContext:context];
         }
         @catch (NuBreakException *exception) {
             break;
@@ -7870,11 +7858,7 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 
 @implementation Nu_progn_operator
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    id value = [NSNull NU_null];
-    for (id cursor in [cdr cellEnumerator]) {
-        value = [[cursor car] evalWithContext:context];
-    }
-    return value;
+    return [cdr evalAsPrognInContext:context];
 }
 
 @end
