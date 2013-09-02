@@ -70,6 +70,7 @@
 #define IS_NOT_NULL(xyz) ((xyz) && (((id) (xyz)) != [NSNull null]))
 typedef BOOL(^NUCellPairBlock)(id value1, id value2);
 typedef id(^NUCellMapBlock)(id cell, NSMutableDictionary *context);
+typedef id (^NUAccumulationBlock)(id sum, id obj, NSMutableDictionary *context);
 // We'd like for this to be in the ObjC2 API, but it isn't.
 static void nu_class_addInstanceVariable_withSignature(Class thisClass, const char *variableName, const char *signature);
 
@@ -2809,6 +2810,9 @@ static NSString *getTypeStringFromNode(id node){
 - (id) eitherChainedPairs:(NUCellPairBlock) block context:(NSMutableDictionary *) context;
 - (id) eachEvaluatedListInContext:(NSMutableDictionary *) context;
 - (NuCellEnumerator *) cellEnumerator;
+
+- (id) reduce:(NUAccumulationBlock) block initial:(id) initial context:(NSMutableDictionary *) context;
+- (id) map:(NUCellMapBlock) block context:(NSMutableDictionary *) context;
 @end
 
 @implementation NuCell
@@ -3190,51 +3194,34 @@ static NSString *getTypeStringFromNode(id node){
 }
 
 - (id) map:(id) block{
-    NuCell *parent = [[[NuCell alloc] init] autorelease];
-    if (nu_objectIsKindOfClass(block, [NuBlock class])) {
-        id args = [[NuCell alloc] init];
-        id resultCursor = parent;
-        for (id cursor in [self cellEnumerator]) {
-            [args setCar:[cursor car]];
-            id result = [block evalWithArguments:args context:[NSNull NU_null]];
-            [resultCursor setCdr:[NuCell cellWithCar:result cdr:[resultCursor cdr]]];
-            resultCursor = [resultCursor cdr];
-        }
-        [args release];
-    }
-    else
-        return [NSNull NU_null];
-    NuCell *result = [parent cdr];
-    return result;
+    if (!nu_objectIsKindOfClass(block, [NuBlock class])) return [NSNull NU_null];
+
+    return [self map:^id(id cell, NSMutableDictionary *context) {
+        id args = [NuCell cellWithCar:[cell car] cdr:nil];
+        return  [block evalWithArguments:args context:context];
+    } context:[NSNull NU_null]];
 }
 
 - (id) mapSelector:(SEL) sel{
-    NuCell *parent = [[NuCell alloc] init];
-    id args = [[NuCell alloc] init];
-    id resultCursor = parent;
-    for (id cursor in [self cellEnumerator]) {
-        id object = [cursor car];
-        id result = [object performSelector:sel];
-        [resultCursor setCdr:[NuCell cellWithCar:result cdr:[resultCursor cdr]]];
-        resultCursor = [resultCursor cdr];
-    }
-    [args release];
-    NuCell *result = [parent cdr];
-    [parent release];
-    return result;
+    return [self map:^id(id cell, NSMutableDictionary *context) {
+        id object = [cell car];
+        return [object performSelector:sel];
+    } context:[NSNull NU_null]];
 }
 
 - (id) reduce:(id) block from:(id) initial{
+    if (!nu_objectIsKindOfClass(block, [NuBlock class])) return initial;
+
+    return [self reduce:^id(id sum, id obj, NSMutableDictionary *context) {
+        id args = [NuCell cellWithCar:sum cdr:[NuCell cellWithCar:obj cdr:nil]];
+        return [block evalWithArguments:args context:context];
+    } initial:initial context:[NSNull NU_null]];
+}
+
+- (id) reduce:(NUAccumulationBlock) block initial:(id) initial context:(NSMutableDictionary *) context{
     id result = initial;
-    if (nu_objectIsKindOfClass(block, [NuBlock class])) {
-        id args = [[NuCell alloc] init];
-        [args setCdr:[[[NuCell alloc] init] autorelease]];
-        for (id cursor in [self cellEnumerator]) {
-            [args setCar:result];
-            [[args cdr] setCar:[cursor car]];
-            result = [block evalWithArguments:args context:[NSNull NU_null]];
-        }
-        [args release];
+    for (id cursor in [self cellEnumerator]) {
+        result = block(result, [cursor car], context);
     }
     return result;
 }
@@ -7549,25 +7536,18 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
     // otherwise, it's an addition
     id firstArgument = [[cdr car] evalWithContext:context];
     if (nu_objectIsKindOfClass(firstArgument, [NSValue class])) {
-        double sum = [firstArgument doubleValue];
-        id cursor = [cdr cdr];
-        while (cursor && (cursor != [NSNull NU_null])) {
-            sum += [[[cursor car] evalWithContext:context] doubleValue];
-            cursor = [cursor cdr];
-        }
-        return [NSNumber numberWithDouble:sum];
+        return [cdr reduce:^id(id sum, id object, NSMutableDictionary *context) {
+            return @([sum doubleValue] + [[object evalWithContext:context] doubleValue]);
+        } initial:@0 context:context];
     }
     else {
-        NSMutableString *result = [NSMutableString stringWithString:[firstArgument stringValue]];
-        id cursor = [cdr cdr];
-        while (cursor && (cursor != [NSNull NU_null])) {
-            id carValue = [[cursor car] evalWithContext:context];
-            if (carValue && (carValue != [NSNull NU_null])) {
-                [result appendString:[carValue stringValue]];
+        return [cdr reduce:^id(id sum, id object, NSMutableDictionary *context) {
+            id car = [object evalWithContext:context];
+            if (car && car != [NSNull NU_null]) {
+                [sum appendString:[car stringValue]];
             }
-            cursor = [cursor cdr];
-        }
-        return result;
+            return sum;
+        } initial:[NSMutableString string] context:context];
     }
 }
 
@@ -7578,13 +7558,9 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 
 @implementation Nu_multiply_operator
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
-    double product = 1;
-    id cursor = cdr;
-    while (cursor && (cursor != [NSNull NU_null])) {
-        product *= [[[cursor car] evalWithContext:context] doubleValue];
-        cursor = [cursor cdr];
-    }
-    return [NSNumber numberWithDouble:product];
+    return [cdr reduce:^id(id sum, id obj, NSMutableDictionary *context) {
+        return @([sum doubleValue] * [[obj evalWithContext:context] doubleValue]);
+    } initial:@1 context:context];
 }
 
 @end
@@ -7619,6 +7595,9 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
         }
     }
     return [NSNumber numberWithDouble:sum];
+//    return [cdr reduce:^id(id sum, id obj, NSMutableDictionary *context) {
+//        return @([sum doubleValue] - [[obj evalWithContext:context] doubleValue]);
+//    } initial:@0 context:context];
 }
 
 @end
