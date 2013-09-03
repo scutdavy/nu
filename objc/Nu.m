@@ -6655,9 +6655,10 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
 - (id) callWithArguments:(id)cdr context:(NSMutableDictionary *)context{
     id newList = [NSNull NU_null];
     id cursor = nil;
-    id list_to_append = cdr;
-    while (list_to_append && (list_to_append != [NSNull NU_null])) {
+    
+    for (id list_to_append in [cdr cellEnumerator]) {
         id item_to_append = [[list_to_append car] evalWithContext:context];
+        
         while (item_to_append && (item_to_append != [NSNull NU_null])) {
             if (newList == [NSNull NU_null]) {
                 newList = [[[NuCell alloc] init] autorelease];
@@ -6671,7 +6672,6 @@ static void nu_markEndOfObjCTypeString(char *type, size_t len){
             [cursor setCar: item];
             item_to_append = [item_to_append cdr];
         }
-        list_to_append = [list_to_append cdr];
     }
     return newList;
 }
