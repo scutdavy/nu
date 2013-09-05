@@ -79,6 +79,10 @@
 
 #pragma mark -
 #pragma mark List Representation
+@class NuCell;
+@interface NuCellEnumerator : NSEnumerator
++ (instancetype) enumeratorWithCell:(NuCell *) cell;
+@end
 
 /*!
  @class NuCell
@@ -96,6 +100,13 @@
 @interface NuCell : NSObject <NSCoding>
 @property (nonatomic, strong) id car;
 @property (nonatomic, strong) id cdr;
+
+/**
+ *  cell enumerator for list
+ *
+ *  @return enumerator
+ */
+- (NuCellEnumerator *) cellEnumerator;
 
 /*! Create a new cell with a specifed car and cdr. */
 + (id) cellWithCar:(id)car cdr:(id)cdr;

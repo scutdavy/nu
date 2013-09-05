@@ -577,26 +577,6 @@ id _nulist(id firstObject, ...){
         [_context setPossiblyNullObject:c forKey:PARENT_KEY];
         [_context setPossiblyNullObject:[c objectForKey:SYMBOLS_KEY] forKey:SYMBOLS_KEY];
 #endif
-        
-        // Check for the presence of "*args" in parameter list
-        id plist = _parameters;
-        
-        if (!(   ([_parameters length] == 1)
-              && ([[[_parameters car] stringValue] isEqualToString:@"*args"])))
-        {
-            while (plist && (plist != [NSNull NU_null]))
-            {
-                id parameter = [plist car];
-                
-                if ([[parameter stringValue] isEqualToString:@"*args"])
-                {
-                    printf("Warning: Overriding implicit variable '*args'.\n");
-                    return self;
-                }
-                
-                plist = [plist cdr];
-            }
-        }
     }
     return self;
 }
@@ -2778,10 +2758,6 @@ static NSString *getTypeStringFromNode(id node){
 
 #pragma mark - NuCell.m
 
-@interface NuCellEnumerator : NSEnumerator
-+ (instancetype) enumeratorWithCell:(NuCell *) cell;
-@end
-
 @interface NuCellEnumerator ()
 @property (nonatomic, strong) NuCell *cursor;
 @end
@@ -2809,7 +2785,6 @@ static NSString *getTypeStringFromNode(id node){
 - (id) allChainedPairs:(NUCellPairBlock) block context:(NSMutableDictionary *) context;
 - (id) eitherChainedPairs:(NUCellPairBlock) block context:(NSMutableDictionary *) context;
 - (id) eachEvaluatedListInContext:(NSMutableDictionary *) context;
-- (NuCellEnumerator *) cellEnumerator;
 
 - (id) reduce:(NUAccumulationBlock) block initial:(id) initial context:(NSMutableDictionary *) context;
 - (id) map:(NUCellMapBlock) block context:(NSMutableDictionary *) context;
