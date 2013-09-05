@@ -108,6 +108,9 @@
  */
 - (NuCellEnumerator *) cellEnumerator;
 
+
+- (id) evalAsPrognInContext:(NSMutableDictionary *) context;
+
 /*! Create a new cell with a specifed car and cdr. */
 + (id) cellWithCar:(id)car cdr:(id)cdr;
 /*! Get the last object in a list by traversing the list. Use this carefully. */
