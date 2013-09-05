@@ -68,9 +68,7 @@
 #import "Nu.h"
 
 #define IS_NOT_NULL(xyz) ((xyz) && (((id) (xyz)) != [NSNull null]))
-typedef BOOL(^NUCellPairBlock)(id value1, id value2);
-typedef id(^NUCellMapBlock)(id cell, NSMutableDictionary *context);
-typedef id (^NUAccumulationBlock)(id sum, id obj, NSMutableDictionary *context);
+
 // We'd like for this to be in the ObjC2 API, but it isn't.
 static void nu_class_addInstanceVariable_withSignature(Class thisClass, const char *variableName, const char *signature);
 
@@ -611,7 +609,6 @@ id _nulist(id firstObject, ...){
     }
     //NSLog(@"block eval %@", [cdr stringValue]);
     // loop over the parameters, looking up their values in the calling_context and copying them into the evaluation_context
-    id plist = _parameters;
     id vlist = cdr;
     id evaluation_context = [_context mutableCopy];
     
@@ -619,24 +616,20 @@ id _nulist(id firstObject, ...){
 	NuSymbolTable *symbolTable = [evaluation_context objectForKey:SYMBOLS_KEY];
 	[evaluation_context setPossiblyNullObject:cdr forKey:[symbolTable symbolWithString:@"*args"]];
     
-    while (plist && (plist != [NSNull NU_null])) {
-        id parameter = [plist car];
+    for (id pcursor in [_parameters cellEnumerator]) {
+        id parameter = [pcursor car];
         if ([[parameter stringValue] characterAtIndex:0] == '*') {
-            id varargs = [[[NuCell alloc] init] autorelease];
-            id cursor = varargs;
-            while (vlist != [NSNull NU_null]) {
-                [cursor setCdr:[[[NuCell alloc] init] autorelease]];
-                cursor = [cursor cdr];
-                id value = [vlist car];
-                if (calling_context && (calling_context != [NSNull NU_null]))
-                    value = [value evalWithContext:calling_context];
-                [cursor setCar:value];
-                vlist = [vlist cdr];
-            }
-            [evaluation_context setPossiblyNullObject:[varargs cdr] forKey:parameter];
-            plist = [plist cdr];
+            id varargs = [vlist map:^id(id cell, NSMutableDictionary *context) {
+                id value = [cell car];
+                if (context && context != [NSNull NU_null]) {
+                    value = [value evalWithContext:context];
+                }
+                return value;
+            } context:calling_context];
+            
+            [evaluation_context setPossiblyNullObject:varargs forKey:parameter];
             // this must be the last element in the parameter list
-            if (plist != [NSNull NU_null]) {
+            if ([pcursor cdr] != [NSNull NU_null]) {
                 [NSException raise:@"NuBadParameterList"
                             format:@"Variable argument list must be the last parameter in the parameter list: %@",
                  [_parameters stringValue]];
@@ -646,12 +639,11 @@ id _nulist(id firstObject, ...){
             id value = [vlist car];
             if (calling_context && (calling_context != [NSNull NU_null]))
                 value = [value evalWithContext:calling_context];
-            //NSLog(@"setting %@ = %@", parameter, value);
             [evaluation_context setPossiblyNullObject:value forKey:parameter];
-            plist = [plist cdr];
             vlist = [vlist cdr];
         }
     }
+    
     // evaluate the body of the block with the saved context (implicit progn)
     id value = [NSNull NU_null];
     @try {
@@ -2783,7 +2775,6 @@ static NSString *getTypeStringFromNode(id node){
 
 
 - (id) reduce:(NUAccumulationBlock) block initial:(id) initial context:(NSMutableDictionary *) context;
-- (id) map:(NUCellMapBlock) block context:(NSMutableDictionary *) context;
 
 @end
 
@@ -3899,6 +3890,10 @@ static BOOL NuException_verboseExceptionReporting = NO;
 }
 
 - (id) evalAsPrognInContext:(NSMutableDictionary *) context{
+    return nil;
+}
+
+- (id) map:(NUCellMapBlock) block context:(NSMutableDictionary *) context{
     return nil;
 }
 

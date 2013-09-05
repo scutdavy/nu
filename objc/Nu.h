@@ -97,6 +97,10 @@
  The cdr of the last element in a list is nil.
  In Nu, nil is represented with the <code>[NSNull null]</code> object.
  */
+
+typedef BOOL(^NUCellPairBlock)(id value1, id value2);
+typedef id(^NUCellMapBlock)(id cell, NSMutableDictionary *context);
+typedef id (^NUAccumulationBlock)(id sum, id obj, NSMutableDictionary *context);
 @interface NuCell : NSObject <NSCoding>
 @property (nonatomic, strong) id car;
 @property (nonatomic, strong) id cdr;
@@ -110,6 +114,7 @@
 
 
 - (id) evalAsPrognInContext:(NSMutableDictionary *) context;
+- (id) map:(NUCellMapBlock) block context:(NSMutableDictionary *) context;
 
 /*! Create a new cell with a specifed car and cdr. */
 + (id) cellWithCar:(id)car cdr:(id)cdr;
