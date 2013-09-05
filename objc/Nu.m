@@ -713,13 +713,9 @@ static id getObjectFromContext(id context, id symbol){
     }
     // evaluate the body of the block with the saved context (implicit progn)
     id value = [NSNull NU_null];
-    id cursor = _body;
     @try
     {
-        while (cursor && (cursor != [NSNull NU_null])) {
-            value = [[cursor car] evalWithContext:evaluation_context];
-            cursor = [cursor cdr];
-        }
+        value = [_body evalAsPrognInContext:evaluation_context];
     }
     @catch (NuReturnException *exception) {
         value = [exception value];
