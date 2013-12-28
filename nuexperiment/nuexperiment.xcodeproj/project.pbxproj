@@ -1,1022 +1,522 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-	<key>archiveVersion</key>
-	<string>1</string>
-	<key>classes</key>
-	<dict/>
-	<key>objectVersion</key>
-	<string>46</string>
-	<key>objects</key>
-	<dict>
-		<key>353AFE0CF9B340A6878FE185</key>
-		<dict>
-			<key>fileRef</key>
-			<string>946896237061421598926856</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>3B794CE32A2B4034932DE7D9</key>
-		<dict>
-			<key>buildActionMask</key>
-			<string>2147483647</string>
-			<key>files</key>
-			<array/>
-			<key>inputPaths</key>
-			<array/>
-			<key>isa</key>
-			<string>PBXShellScriptBuildPhase</string>
-			<key>name</key>
-			<string>Copy Pods Resources</string>
-			<key>outputPaths</key>
-			<array/>
-			<key>runOnlyForDeploymentPostprocessing</key>
-			<string>0</string>
-			<key>shellPath</key>
-			<string>/bin/sh</string>
-			<key>shellScript</key>
-			<string>"${SRCROOT}/Pods/Pods-resources.sh"
-</string>
-			<key>showEnvVarsInLog</key>
-			<string>0</string>
-		</dict>
-		<key>946896237061421598926856</key>
-		<dict>
-			<key>explicitFileType</key>
-			<string>archive.ar</string>
-			<key>includeInIndex</key>
-			<string>0</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>path</key>
-			<string>libPods.a</string>
-			<key>sourceTree</key>
-			<string>BUILT_PRODUCTS_DIR</string>
-		</dict>
-		<key>A233BE988BC1462D8B46EBB7</key>
-		<dict>
-			<key>includeInIndex</key>
-			<string>1</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>text.xcconfig</string>
-			<key>name</key>
-			<string>Pods.xcconfig</string>
-			<key>path</key>
-			<string>Pods/Pods.xcconfig</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>CC550D46F9B64268B6234356</key>
-		<dict>
-			<key>buildActionMask</key>
-			<string>2147483647</string>
-			<key>files</key>
-			<array/>
-			<key>inputPaths</key>
-			<array/>
-			<key>isa</key>
-			<string>PBXShellScriptBuildPhase</string>
-			<key>name</key>
-			<string>Check Pods Manifest.lock</string>
-			<key>outputPaths</key>
-			<array/>
-			<key>runOnlyForDeploymentPostprocessing</key>
-			<string>0</string>
-			<key>shellPath</key>
-			<string>/bin/sh</string>
-			<key>shellScript</key>
-			<string>diff "${PODS_ROOT}/../Podfile.lock" "${PODS_ROOT}/Manifest.lock" &gt; /dev/null
-if [[ $? != 0 ]] ; then
-    cat &lt;&lt; EOM
-error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.
-EOM
-    exit 1
-fi
-</string>
-			<key>showEnvVarsInLog</key>
-			<string>0</string>
-		</dict>
-		<key>D9430000186EBA1200879E5D</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.objc</string>
-			<key>path</key>
-			<string>main.m</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>D9430001186EBA1200879E5D</key>
-		<dict>
-			<key>fileRef</key>
-			<string>D9430000186EBA1200879E5D</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>D9430002186EBA1200879E5D</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.h</string>
-			<key>path</key>
-			<string>nuexperiment-Prefix.pch</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>D9430003186EBA1200879E5D</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.h</string>
-			<key>path</key>
-			<string>AppDelegate.h</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>D9430004186EBA1200879E5D</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.objc</string>
-			<key>path</key>
-			<string>AppDelegate.m</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>D9430005186EBA1200879E5D</key>
-		<dict>
-			<key>fileRef</key>
-			<string>D9430004186EBA1200879E5D</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>D9430006186EBA1200879E5D</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>folder.assetcatalog</string>
-			<key>path</key>
-			<string>Images.xcassets</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>D9430007186EBA1200879E5D</key>
-		<dict>
-			<key>fileRef</key>
-			<string>D9430006186EBA1200879E5D</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>D9430008186EBA1200879E5D</key>
-		<dict>
-			<key>buildActionMask</key>
-			<string>2147483647</string>
-			<key>files</key>
-			<array>
-				<string>D943001A186EBA1200879E5D</string>
-			</array>
-			<key>isa</key>
-			<string>PBXSourcesBuildPhase</string>
-			<key>runOnlyForDeploymentPostprocessing</key>
-			<string>0</string>
-		</dict>
-		<key>D9430009186EBA1200879E5D</key>
-		<dict>
-			<key>buildActionMask</key>
-			<string>2147483647</string>
-			<key>files</key>
-			<array>
-				<string>D943000E186EBA1200879E5D</string>
-				<string>D9430010186EBA1200879E5D</string>
-				<string>D943000F186EBA1200879E5D</string>
-			</array>
-			<key>isa</key>
-			<string>PBXFrameworksBuildPhase</string>
-			<key>runOnlyForDeploymentPostprocessing</key>
-			<string>0</string>
-		</dict>
-		<key>D943000A186EBA1200879E5D</key>
-		<dict>
-			<key>buildActionMask</key>
-			<string>2147483647</string>
-			<key>files</key>
-			<array>
-				<string>D9430018186EBA1200879E5D</string>
-			</array>
-			<key>isa</key>
-			<string>PBXResourcesBuildPhase</string>
-			<key>runOnlyForDeploymentPostprocessing</key>
-			<string>0</string>
-		</dict>
-		<key>D943000B186EBA1200879E5D</key>
-		<dict>
-			<key>buildConfigurationList</key>
-			<string>D9430020186EBA1200879E5D</string>
-			<key>buildPhases</key>
-			<array>
-				<string>D9430008186EBA1200879E5D</string>
-				<string>D9430009186EBA1200879E5D</string>
-				<string>D943000A186EBA1200879E5D</string>
-			</array>
-			<key>buildRules</key>
-			<array/>
-			<key>dependencies</key>
-			<array>
-				<string>D9430012186EBA1200879E5D</string>
-			</array>
-			<key>isa</key>
-			<string>PBXNativeTarget</string>
-			<key>name</key>
-			<string>nuexperimentTests</string>
-			<key>productName</key>
-			<string>nuexperimentTests</string>
-			<key>productReference</key>
-			<string>D943000C186EBA1200879E5D</string>
-			<key>productType</key>
-			<string>com.apple.product-type.bundle.unit-test</string>
-		</dict>
-		<key>D943000C186EBA1200879E5D</key>
-		<dict>
-			<key>explicitFileType</key>
-			<string>wrapper.cfbundle</string>
-			<key>includeInIndex</key>
-			<string>0</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>path</key>
-			<string>nuexperimentTests.xctest</string>
-			<key>sourceTree</key>
-			<string>BUILT_PRODUCTS_DIR</string>
-		</dict>
-		<key>D943000D186EBA1200879E5D</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>wrapper.framework</string>
-			<key>name</key>
-			<string>XCTest.framework</string>
-			<key>path</key>
-			<string>Library/Frameworks/XCTest.framework</string>
-			<key>sourceTree</key>
-			<string>DEVELOPER_DIR</string>
-		</dict>
-		<key>D943000E186EBA1200879E5D</key>
-		<dict>
-			<key>fileRef</key>
-			<string>D943000D186EBA1200879E5D</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>D943000F186EBA1200879E5D</key>
-		<dict>
-			<key>fileRef</key>
-			<string>D943FFF4186EBA1200879E5D</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>D9430010186EBA1200879E5D</key>
-		<dict>
-			<key>fileRef</key>
-			<string>D943FFF8186EBA1200879E5D</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>D9430011186EBA1200879E5D</key>
-		<dict>
-			<key>containerPortal</key>
-			<string>D943FFE9186EBA1200879E5D</string>
-			<key>isa</key>
-			<string>PBXContainerItemProxy</string>
-			<key>proxyType</key>
-			<string>1</string>
-			<key>remoteGlobalIDString</key>
-			<string>D943FFF0186EBA1200879E5D</string>
-			<key>remoteInfo</key>
-			<string>nuexperiment</string>
-		</dict>
-		<key>D9430012186EBA1200879E5D</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXTargetDependency</string>
-			<key>target</key>
-			<string>D943FFF0186EBA1200879E5D</string>
-			<key>targetProxy</key>
-			<string>D9430011186EBA1200879E5D</string>
-		</dict>
-		<key>D9430013186EBA1200879E5D</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>D9430019186EBA1200879E5D</string>
-				<string>D9430014186EBA1200879E5D</string>
-			</array>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>path</key>
-			<string>nuexperimentTests</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>D9430014186EBA1200879E5D</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>D9430015186EBA1200879E5D</string>
-				<string>D9430016186EBA1200879E5D</string>
-			</array>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>name</key>
-			<string>Supporting Files</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>D9430015186EBA1200879E5D</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>text.plist.xml</string>
-			<key>path</key>
-			<string>nuexperimentTests-Info.plist</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>D9430016186EBA1200879E5D</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>D9430017186EBA1200879E5D</string>
-			</array>
-			<key>isa</key>
-			<string>PBXVariantGroup</string>
-			<key>name</key>
-			<string>InfoPlist.strings</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>D9430017186EBA1200879E5D</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>text.plist.strings</string>
-			<key>name</key>
-			<string>en</string>
-			<key>path</key>
-			<string>en.lproj/InfoPlist.strings</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>D9430018186EBA1200879E5D</key>
-		<dict>
-			<key>fileRef</key>
-			<string>D9430016186EBA1200879E5D</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>D9430019186EBA1200879E5D</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.objc</string>
-			<key>path</key>
-			<string>nuexperimentTests.m</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>D943001A186EBA1200879E5D</key>
-		<dict>
-			<key>fileRef</key>
-			<string>D9430019186EBA1200879E5D</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>D943001B186EBA1200879E5D</key>
-		<dict>
-			<key>buildSettings</key>
-			<dict>
-				<key>ALWAYS_SEARCH_USER_PATHS</key>
-				<string>NO</string>
-				<key>ARCHS</key>
-				<string>$(ARCHS_STANDARD_INCLUDING_64_BIT)</string>
-				<key>CLANG_CXX_LANGUAGE_STANDARD</key>
-				<string>gnu++0x</string>
-				<key>CLANG_CXX_LIBRARY</key>
-				<string>libc++</string>
-				<key>CLANG_ENABLE_MODULES</key>
-				<string>YES</string>
-				<key>CLANG_ENABLE_OBJC_ARC</key>
-				<string>YES</string>
-				<key>CLANG_WARN_BOOL_CONVERSION</key>
-				<string>YES</string>
-				<key>CLANG_WARN_CONSTANT_CONVERSION</key>
-				<string>YES</string>
-				<key>CLANG_WARN_DIRECT_OBJC_ISA_USAGE</key>
-				<string>YES_ERROR</string>
-				<key>CLANG_WARN_EMPTY_BODY</key>
-				<string>YES</string>
-				<key>CLANG_WARN_ENUM_CONVERSION</key>
-				<string>YES</string>
-				<key>CLANG_WARN_INT_CONVERSION</key>
-				<string>YES</string>
-				<key>CLANG_WARN_OBJC_ROOT_CLASS</key>
-				<string>YES_ERROR</string>
-				<key>CLANG_WARN__DUPLICATE_METHOD_MATCH</key>
-				<string>YES</string>
-				<key>CODE_SIGN_IDENTITY[sdk=iphoneos*]</key>
-				<string>iPhone Developer</string>
-				<key>COPY_PHASE_STRIP</key>
-				<string>NO</string>
-				<key>GCC_C_LANGUAGE_STANDARD</key>
-				<string>gnu99</string>
-				<key>GCC_DYNAMIC_NO_PIC</key>
-				<string>NO</string>
-				<key>GCC_OPTIMIZATION_LEVEL</key>
-				<string>0</string>
-				<key>GCC_PREPROCESSOR_DEFINITIONS</key>
-				<array>
-					<string>DEBUG=1</string>
-					<string>$(inherited)</string>
-				</array>
-				<key>GCC_SYMBOLS_PRIVATE_EXTERN</key>
-				<string>NO</string>
-				<key>GCC_WARN_64_TO_32_BIT_CONVERSION</key>
-				<string>YES</string>
-				<key>GCC_WARN_ABOUT_RETURN_TYPE</key>
-				<string>YES_ERROR</string>
-				<key>GCC_WARN_UNDECLARED_SELECTOR</key>
-				<string>YES</string>
-				<key>GCC_WARN_UNINITIALIZED_AUTOS</key>
-				<string>YES</string>
-				<key>GCC_WARN_UNUSED_FUNCTION</key>
-				<string>YES</string>
-				<key>GCC_WARN_UNUSED_VARIABLE</key>
-				<string>YES</string>
-				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
-				<string>7.0</string>
-				<key>ONLY_ACTIVE_ARCH</key>
-				<string>YES</string>
-				<key>SDKROOT</key>
-				<string>iphoneos</string>
-				<key>TARGETED_DEVICE_FAMILY</key>
-				<string>1,2</string>
-			</dict>
-			<key>isa</key>
-			<string>XCBuildConfiguration</string>
-			<key>name</key>
-			<string>Debug</string>
-		</dict>
-		<key>D943001C186EBA1200879E5D</key>
-		<dict>
-			<key>buildSettings</key>
-			<dict>
-				<key>ALWAYS_SEARCH_USER_PATHS</key>
-				<string>NO</string>
-				<key>ARCHS</key>
-				<string>$(ARCHS_STANDARD_INCLUDING_64_BIT)</string>
-				<key>CLANG_CXX_LANGUAGE_STANDARD</key>
-				<string>gnu++0x</string>
-				<key>CLANG_CXX_LIBRARY</key>
-				<string>libc++</string>
-				<key>CLANG_ENABLE_MODULES</key>
-				<string>YES</string>
-				<key>CLANG_ENABLE_OBJC_ARC</key>
-				<string>YES</string>
-				<key>CLANG_WARN_BOOL_CONVERSION</key>
-				<string>YES</string>
-				<key>CLANG_WARN_CONSTANT_CONVERSION</key>
-				<string>YES</string>
-				<key>CLANG_WARN_DIRECT_OBJC_ISA_USAGE</key>
-				<string>YES_ERROR</string>
-				<key>CLANG_WARN_EMPTY_BODY</key>
-				<string>YES</string>
-				<key>CLANG_WARN_ENUM_CONVERSION</key>
-				<string>YES</string>
-				<key>CLANG_WARN_INT_CONVERSION</key>
-				<string>YES</string>
-				<key>CLANG_WARN_OBJC_ROOT_CLASS</key>
-				<string>YES_ERROR</string>
-				<key>CLANG_WARN__DUPLICATE_METHOD_MATCH</key>
-				<string>YES</string>
-				<key>CODE_SIGN_IDENTITY[sdk=iphoneos*]</key>
-				<string>iPhone Developer</string>
-				<key>COPY_PHASE_STRIP</key>
-				<string>YES</string>
-				<key>ENABLE_NS_ASSERTIONS</key>
-				<string>NO</string>
-				<key>GCC_C_LANGUAGE_STANDARD</key>
-				<string>gnu99</string>
-				<key>GCC_WARN_64_TO_32_BIT_CONVERSION</key>
-				<string>YES</string>
-				<key>GCC_WARN_ABOUT_RETURN_TYPE</key>
-				<string>YES_ERROR</string>
-				<key>GCC_WARN_UNDECLARED_SELECTOR</key>
-				<string>YES</string>
-				<key>GCC_WARN_UNINITIALIZED_AUTOS</key>
-				<string>YES</string>
-				<key>GCC_WARN_UNUSED_FUNCTION</key>
-				<string>YES</string>
-				<key>GCC_WARN_UNUSED_VARIABLE</key>
-				<string>YES</string>
-				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
-				<string>7.0</string>
-				<key>SDKROOT</key>
-				<string>iphoneos</string>
-				<key>TARGETED_DEVICE_FAMILY</key>
-				<string>1,2</string>
-				<key>VALIDATE_PRODUCT</key>
-				<string>YES</string>
-			</dict>
-			<key>isa</key>
-			<string>XCBuildConfiguration</string>
-			<key>name</key>
-			<string>Release</string>
-		</dict>
-		<key>D943001D186EBA1200879E5D</key>
-		<dict>
-			<key>buildConfigurations</key>
-			<array>
-				<string>D943001E186EBA1200879E5D</string>
-				<string>D943001F186EBA1200879E5D</string>
-			</array>
-			<key>defaultConfigurationIsVisible</key>
-			<string>0</string>
-			<key>isa</key>
-			<string>XCConfigurationList</string>
-		</dict>
-		<key>D943001E186EBA1200879E5D</key>
-		<dict>
-			<key>baseConfigurationReference</key>
-			<string>A233BE988BC1462D8B46EBB7</string>
-			<key>buildSettings</key>
-			<dict>
-				<key>ASSETCATALOG_COMPILER_APPICON_NAME</key>
-				<string>AppIcon</string>
-				<key>ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME</key>
-				<string>LaunchImage</string>
-				<key>GCC_PRECOMPILE_PREFIX_HEADER</key>
-				<string>YES</string>
-				<key>GCC_PREFIX_HEADER</key>
-				<string>nuexperiment/nuexperiment-Prefix.pch</string>
-				<key>INFOPLIST_FILE</key>
-				<string>nuexperiment/nuexperiment-Info.plist</string>
-				<key>PRODUCT_NAME</key>
-				<string>$(TARGET_NAME)</string>
-				<key>WRAPPER_EXTENSION</key>
-				<string>app</string>
-			</dict>
-			<key>isa</key>
-			<string>XCBuildConfiguration</string>
-			<key>name</key>
-			<string>Debug</string>
-		</dict>
-		<key>D943001F186EBA1200879E5D</key>
-		<dict>
-			<key>baseConfigurationReference</key>
-			<string>A233BE988BC1462D8B46EBB7</string>
-			<key>buildSettings</key>
-			<dict>
-				<key>ASSETCATALOG_COMPILER_APPICON_NAME</key>
-				<string>AppIcon</string>
-				<key>ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME</key>
-				<string>LaunchImage</string>
-				<key>GCC_PRECOMPILE_PREFIX_HEADER</key>
-				<string>YES</string>
-				<key>GCC_PREFIX_HEADER</key>
-				<string>nuexperiment/nuexperiment-Prefix.pch</string>
-				<key>INFOPLIST_FILE</key>
-				<string>nuexperiment/nuexperiment-Info.plist</string>
-				<key>PRODUCT_NAME</key>
-				<string>$(TARGET_NAME)</string>
-				<key>WRAPPER_EXTENSION</key>
-				<string>app</string>
-			</dict>
-			<key>isa</key>
-			<string>XCBuildConfiguration</string>
-			<key>name</key>
-			<string>Release</string>
-		</dict>
-		<key>D9430020186EBA1200879E5D</key>
-		<dict>
-			<key>buildConfigurations</key>
-			<array>
-				<string>D9430021186EBA1200879E5D</string>
-				<string>D9430022186EBA1200879E5D</string>
-			</array>
-			<key>defaultConfigurationIsVisible</key>
-			<string>0</string>
-			<key>isa</key>
-			<string>XCConfigurationList</string>
-		</dict>
-		<key>D9430021186EBA1200879E5D</key>
-		<dict>
-			<key>buildSettings</key>
-			<dict>
-				<key>ARCHS</key>
-				<string>$(ARCHS_STANDARD_INCLUDING_64_BIT)</string>
-				<key>BUNDLE_LOADER</key>
-				<string>$(BUILT_PRODUCTS_DIR)/nuexperiment.app/nuexperiment</string>
-				<key>FRAMEWORK_SEARCH_PATHS</key>
-				<array>
-					<string>$(SDKROOT)/Developer/Library/Frameworks</string>
-					<string>$(inherited)</string>
-					<string>$(DEVELOPER_FRAMEWORKS_DIR)</string>
-				</array>
-				<key>GCC_PRECOMPILE_PREFIX_HEADER</key>
-				<string>YES</string>
-				<key>GCC_PREFIX_HEADER</key>
-				<string>nuexperiment/nuexperiment-Prefix.pch</string>
-				<key>GCC_PREPROCESSOR_DEFINITIONS</key>
-				<array>
-					<string>DEBUG=1</string>
-					<string>$(inherited)</string>
-				</array>
-				<key>INFOPLIST_FILE</key>
-				<string>nuexperimentTests/nuexperimentTests-Info.plist</string>
-				<key>PRODUCT_NAME</key>
-				<string>$(TARGET_NAME)</string>
-				<key>TEST_HOST</key>
-				<string>$(BUNDLE_LOADER)</string>
-				<key>WRAPPER_EXTENSION</key>
-				<string>xctest</string>
-			</dict>
-			<key>isa</key>
-			<string>XCBuildConfiguration</string>
-			<key>name</key>
-			<string>Debug</string>
-		</dict>
-		<key>D9430022186EBA1200879E5D</key>
-		<dict>
-			<key>buildSettings</key>
-			<dict>
-				<key>ARCHS</key>
-				<string>$(ARCHS_STANDARD_INCLUDING_64_BIT)</string>
-				<key>BUNDLE_LOADER</key>
-				<string>$(BUILT_PRODUCTS_DIR)/nuexperiment.app/nuexperiment</string>
-				<key>FRAMEWORK_SEARCH_PATHS</key>
-				<array>
-					<string>$(SDKROOT)/Developer/Library/Frameworks</string>
-					<string>$(inherited)</string>
-					<string>$(DEVELOPER_FRAMEWORKS_DIR)</string>
-				</array>
-				<key>GCC_PRECOMPILE_PREFIX_HEADER</key>
-				<string>YES</string>
-				<key>GCC_PREFIX_HEADER</key>
-				<string>nuexperiment/nuexperiment-Prefix.pch</string>
-				<key>INFOPLIST_FILE</key>
-				<string>nuexperimentTests/nuexperimentTests-Info.plist</string>
-				<key>PRODUCT_NAME</key>
-				<string>$(TARGET_NAME)</string>
-				<key>TEST_HOST</key>
-				<string>$(BUNDLE_LOADER)</string>
-				<key>WRAPPER_EXTENSION</key>
-				<string>xctest</string>
-			</dict>
-			<key>isa</key>
-			<string>XCBuildConfiguration</string>
-			<key>name</key>
-			<string>Release</string>
-		</dict>
-		<key>D943FFE8186EBA1200879E5D</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>D943FFFA186EBA1200879E5D</string>
-				<string>D9430013186EBA1200879E5D</string>
-				<string>D943FFF3186EBA1200879E5D</string>
-				<string>D943FFF2186EBA1200879E5D</string>
-				<string>A233BE988BC1462D8B46EBB7</string>
-			</array>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>D943FFE9186EBA1200879E5D</key>
-		<dict>
-			<key>attributes</key>
-			<dict>
-				<key>LastUpgradeCheck</key>
-				<string>0500</string>
-				<key>ORGANIZATIONNAME</key>
-				<string>dawei</string>
-				<key>TargetAttributes</key>
-				<dict>
-					<key>D943000B186EBA1200879E5D</key>
-					<dict>
-						<key>TestTargetID</key>
-						<string>D943FFF0186EBA1200879E5D</string>
-					</dict>
-				</dict>
-			</dict>
-			<key>buildConfigurationList</key>
-			<string>D943FFEC186EBA1200879E5D</string>
-			<key>compatibilityVersion</key>
-			<string>Xcode 3.2</string>
-			<key>developmentRegion</key>
-			<string>English</string>
-			<key>hasScannedForEncodings</key>
-			<string>0</string>
-			<key>isa</key>
-			<string>PBXProject</string>
-			<key>knownRegions</key>
-			<array>
-				<string>en</string>
-			</array>
-			<key>mainGroup</key>
-			<string>D943FFE8186EBA1200879E5D</string>
-			<key>productRefGroup</key>
-			<string>D943FFF2186EBA1200879E5D</string>
-			<key>projectDirPath</key>
-			<string></string>
-			<key>projectReferences</key>
-			<array/>
-			<key>projectRoot</key>
-			<string></string>
-			<key>targets</key>
-			<array>
-				<string>D943FFF0186EBA1200879E5D</string>
-				<string>D943000B186EBA1200879E5D</string>
-			</array>
-		</dict>
-		<key>D943FFEC186EBA1200879E5D</key>
-		<dict>
-			<key>buildConfigurations</key>
-			<array>
-				<string>D943001B186EBA1200879E5D</string>
-				<string>D943001C186EBA1200879E5D</string>
-			</array>
-			<key>defaultConfigurationIsVisible</key>
-			<string>0</string>
-			<key>defaultConfigurationName</key>
-			<string>Release</string>
-			<key>isa</key>
-			<string>XCConfigurationList</string>
-		</dict>
-		<key>D943FFED186EBA1200879E5D</key>
-		<dict>
-			<key>buildActionMask</key>
-			<string>2147483647</string>
-			<key>files</key>
-			<array>
-				<string>D9430005186EBA1200879E5D</string>
-				<string>D9430001186EBA1200879E5D</string>
-			</array>
-			<key>isa</key>
-			<string>PBXSourcesBuildPhase</string>
-			<key>runOnlyForDeploymentPostprocessing</key>
-			<string>0</string>
-		</dict>
-		<key>D943FFEE186EBA1200879E5D</key>
-		<dict>
-			<key>buildActionMask</key>
-			<string>2147483647</string>
-			<key>files</key>
-			<array>
-				<string>D943FFF7186EBA1200879E5D</string>
-				<string>D943FFF9186EBA1200879E5D</string>
-				<string>D943FFF5186EBA1200879E5D</string>
-				<string>353AFE0CF9B340A6878FE185</string>
-			</array>
-			<key>isa</key>
-			<string>PBXFrameworksBuildPhase</string>
-			<key>runOnlyForDeploymentPostprocessing</key>
-			<string>0</string>
-		</dict>
-		<key>D943FFEF186EBA1200879E5D</key>
-		<dict>
-			<key>buildActionMask</key>
-			<string>2147483647</string>
-			<key>files</key>
-			<array>
-				<string>D943FFFF186EBA1200879E5D</string>
-				<string>D9430007186EBA1200879E5D</string>
-			</array>
-			<key>isa</key>
-			<string>PBXResourcesBuildPhase</string>
-			<key>runOnlyForDeploymentPostprocessing</key>
-			<string>0</string>
-		</dict>
-		<key>D943FFF0186EBA1200879E5D</key>
-		<dict>
-			<key>buildConfigurationList</key>
-			<string>D943001D186EBA1200879E5D</string>
-			<key>buildPhases</key>
-			<array>
-				<string>CC550D46F9B64268B6234356</string>
-				<string>D943FFED186EBA1200879E5D</string>
-				<string>D943FFEE186EBA1200879E5D</string>
-				<string>D943FFEF186EBA1200879E5D</string>
-				<string>3B794CE32A2B4034932DE7D9</string>
-			</array>
-			<key>buildRules</key>
-			<array/>
-			<key>dependencies</key>
-			<array/>
-			<key>isa</key>
-			<string>PBXNativeTarget</string>
-			<key>name</key>
-			<string>nuexperiment</string>
-			<key>productName</key>
-			<string>nuexperiment</string>
-			<key>productReference</key>
-			<string>D943FFF1186EBA1200879E5D</string>
-			<key>productType</key>
-			<string>com.apple.product-type.application</string>
-		</dict>
-		<key>D943FFF1186EBA1200879E5D</key>
-		<dict>
-			<key>explicitFileType</key>
-			<string>wrapper.application</string>
-			<key>includeInIndex</key>
-			<string>0</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>path</key>
-			<string>nuexperiment.app</string>
-			<key>sourceTree</key>
-			<string>BUILT_PRODUCTS_DIR</string>
-		</dict>
-		<key>D943FFF2186EBA1200879E5D</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>D943FFF1186EBA1200879E5D</string>
-				<string>D943000C186EBA1200879E5D</string>
-			</array>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>name</key>
-			<string>Products</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>D943FFF3186EBA1200879E5D</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>D943FFF4186EBA1200879E5D</string>
-				<string>D943FFF6186EBA1200879E5D</string>
-				<string>D943FFF8186EBA1200879E5D</string>
-				<string>D943000D186EBA1200879E5D</string>
-				<string>946896237061421598926856</string>
-			</array>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>name</key>
-			<string>Frameworks</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>D943FFF4186EBA1200879E5D</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>wrapper.framework</string>
-			<key>name</key>
-			<string>Foundation.framework</string>
-			<key>path</key>
-			<string>System/Library/Frameworks/Foundation.framework</string>
-			<key>sourceTree</key>
-			<string>SDKROOT</string>
-		</dict>
-		<key>D943FFF5186EBA1200879E5D</key>
-		<dict>
-			<key>fileRef</key>
-			<string>D943FFF4186EBA1200879E5D</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>D943FFF6186EBA1200879E5D</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>wrapper.framework</string>
-			<key>name</key>
-			<string>CoreGraphics.framework</string>
-			<key>path</key>
-			<string>System/Library/Frameworks/CoreGraphics.framework</string>
-			<key>sourceTree</key>
-			<string>SDKROOT</string>
-		</dict>
-		<key>D943FFF7186EBA1200879E5D</key>
-		<dict>
-			<key>fileRef</key>
-			<string>D943FFF6186EBA1200879E5D</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>D943FFF8186EBA1200879E5D</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>wrapper.framework</string>
-			<key>name</key>
-			<string>UIKit.framework</string>
-			<key>path</key>
-			<string>System/Library/Frameworks/UIKit.framework</string>
-			<key>sourceTree</key>
-			<string>SDKROOT</string>
-		</dict>
-		<key>D943FFF9186EBA1200879E5D</key>
-		<dict>
-			<key>fileRef</key>
-			<string>D943FFF8186EBA1200879E5D</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>D943FFFA186EBA1200879E5D</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>D9430003186EBA1200879E5D</string>
-				<string>D9430004186EBA1200879E5D</string>
-				<string>D9430006186EBA1200879E5D</string>
-				<string>D943FFFB186EBA1200879E5D</string>
-			</array>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>path</key>
-			<string>nuexperiment</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>D943FFFB186EBA1200879E5D</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>D943FFFC186EBA1200879E5D</string>
-				<string>D943FFFD186EBA1200879E5D</string>
-				<string>D9430000186EBA1200879E5D</string>
-				<string>D9430002186EBA1200879E5D</string>
-			</array>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>name</key>
-			<string>Supporting Files</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>D943FFFC186EBA1200879E5D</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>text.plist.xml</string>
-			<key>path</key>
-			<string>nuexperiment-Info.plist</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>D943FFFD186EBA1200879E5D</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>D943FFFE186EBA1200879E5D</string>
-			</array>
-			<key>isa</key>
-			<string>PBXVariantGroup</string>
-			<key>name</key>
-			<string>InfoPlist.strings</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>D943FFFE186EBA1200879E5D</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>text.plist.strings</string>
-			<key>name</key>
-			<string>en</string>
-			<key>path</key>
-			<string>en.lproj/InfoPlist.strings</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>D943FFFF186EBA1200879E5D</key>
-		<dict>
-			<key>fileRef</key>
-			<string>D943FFFD186EBA1200879E5D</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-	</dict>
-	<key>rootObject</key>
-	<string>D943FFE9186EBA1200879E5D</string>
-</dict>
-</plist>
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		353AFE0CF9B340A6878FE185 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 946896237061421598926856 /* libPods.a */; };
+		D9430001186EBA1200879E5D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D9430000186EBA1200879E5D /* main.m */; };
+		D9430005186EBA1200879E5D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D9430004186EBA1200879E5D /* AppDelegate.m */; };
+		D9430007186EBA1200879E5D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D9430006186EBA1200879E5D /* Images.xcassets */; };
+		D943000E186EBA1200879E5D /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D943000D186EBA1200879E5D /* XCTest.framework */; };
+		D943000F186EBA1200879E5D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D943FFF4186EBA1200879E5D /* Foundation.framework */; };
+		D9430010186EBA1200879E5D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D943FFF8186EBA1200879E5D /* UIKit.framework */; };
+		D9430018186EBA1200879E5D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D9430016186EBA1200879E5D /* InfoPlist.strings */; };
+		D943001A186EBA1200879E5D /* nuexperimentTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D9430019186EBA1200879E5D /* nuexperimentTests.m */; };
+		D943FFF5186EBA1200879E5D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D943FFF4186EBA1200879E5D /* Foundation.framework */; };
+		D943FFF7186EBA1200879E5D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D943FFF6186EBA1200879E5D /* CoreGraphics.framework */; };
+		D943FFF9186EBA1200879E5D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D943FFF8186EBA1200879E5D /* UIKit.framework */; };
+		D943FFFF186EBA1200879E5D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D943FFFD186EBA1200879E5D /* InfoPlist.strings */; };
+		D96688EE186EBBDC00683F27 /* Nu.m in Sources */ = {isa = PBXBuildFile; fileRef = D96688ED186EBBDC00683F27 /* Nu.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		D96688EF186EBBDC00683F27 /* Nu.m in Sources */ = {isa = PBXBuildFile; fileRef = D96688ED186EBBDC00683F27 /* Nu.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D9430011186EBA1200879E5D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D943FFE9186EBA1200879E5D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D943FFF0186EBA1200879E5D;
+			remoteInfo = nuexperiment;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		946896237061421598926856 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		A233BE988BC1462D8B46EBB7 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
+		D9430000186EBA1200879E5D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		D9430002186EBA1200879E5D /* nuexperiment-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "nuexperiment-Prefix.pch"; sourceTree = "<group>"; };
+		D9430003186EBA1200879E5D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		D9430004186EBA1200879E5D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		D9430006186EBA1200879E5D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		D943000C186EBA1200879E5D /* nuexperimentTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = nuexperimentTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D943000D186EBA1200879E5D /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		D9430015186EBA1200879E5D /* nuexperimentTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "nuexperimentTests-Info.plist"; sourceTree = "<group>"; };
+		D9430017186EBA1200879E5D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		D9430019186EBA1200879E5D /* nuexperimentTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = nuexperimentTests.m; sourceTree = "<group>"; };
+		D943FFF1186EBA1200879E5D /* nuexperiment.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = nuexperiment.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D943FFF4186EBA1200879E5D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		D943FFF6186EBA1200879E5D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		D943FFF8186EBA1200879E5D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		D943FFFC186EBA1200879E5D /* nuexperiment-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "nuexperiment-Info.plist"; sourceTree = "<group>"; };
+		D943FFFE186EBA1200879E5D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		D96688EC186EBBDC00683F27 /* Nu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Nu.h; sourceTree = "<group>"; };
+		D96688ED186EBBDC00683F27 /* Nu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Nu.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D9430009186EBA1200879E5D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D943000E186EBA1200879E5D /* XCTest.framework in Frameworks */,
+				D9430010186EBA1200879E5D /* UIKit.framework in Frameworks */,
+				D943000F186EBA1200879E5D /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D943FFEE186EBA1200879E5D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D943FFF7186EBA1200879E5D /* CoreGraphics.framework in Frameworks */,
+				D943FFF9186EBA1200879E5D /* UIKit.framework in Frameworks */,
+				D943FFF5186EBA1200879E5D /* Foundation.framework in Frameworks */,
+				353AFE0CF9B340A6878FE185 /* libPods.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D9430013186EBA1200879E5D /* nuexperimentTests */ = {
+			isa = PBXGroup;
+			children = (
+				D9430019186EBA1200879E5D /* nuexperimentTests.m */,
+				D9430014186EBA1200879E5D /* Supporting Files */,
+			);
+			path = nuexperimentTests;
+			sourceTree = "<group>";
+		};
+		D9430014186EBA1200879E5D /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				D9430015186EBA1200879E5D /* nuexperimentTests-Info.plist */,
+				D9430016186EBA1200879E5D /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		D943FFE8186EBA1200879E5D = {
+			isa = PBXGroup;
+			children = (
+				D96688EB186EBBDC00683F27 /* objc */,
+				D943FFFA186EBA1200879E5D /* nuexperiment */,
+				D9430013186EBA1200879E5D /* nuexperimentTests */,
+				D943FFF3186EBA1200879E5D /* Frameworks */,
+				D943FFF2186EBA1200879E5D /* Products */,
+				A233BE988BC1462D8B46EBB7 /* Pods.xcconfig */,
+			);
+			sourceTree = "<group>";
+		};
+		D943FFF2186EBA1200879E5D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D943FFF1186EBA1200879E5D /* nuexperiment.app */,
+				D943000C186EBA1200879E5D /* nuexperimentTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D943FFF3186EBA1200879E5D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D943FFF4186EBA1200879E5D /* Foundation.framework */,
+				D943FFF6186EBA1200879E5D /* CoreGraphics.framework */,
+				D943FFF8186EBA1200879E5D /* UIKit.framework */,
+				D943000D186EBA1200879E5D /* XCTest.framework */,
+				946896237061421598926856 /* libPods.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D943FFFA186EBA1200879E5D /* nuexperiment */ = {
+			isa = PBXGroup;
+			children = (
+				D9430003186EBA1200879E5D /* AppDelegate.h */,
+				D9430004186EBA1200879E5D /* AppDelegate.m */,
+				D9430006186EBA1200879E5D /* Images.xcassets */,
+				D943FFFB186EBA1200879E5D /* Supporting Files */,
+			);
+			path = nuexperiment;
+			sourceTree = "<group>";
+		};
+		D943FFFB186EBA1200879E5D /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				D943FFFC186EBA1200879E5D /* nuexperiment-Info.plist */,
+				D943FFFD186EBA1200879E5D /* InfoPlist.strings */,
+				D9430000186EBA1200879E5D /* main.m */,
+				D9430002186EBA1200879E5D /* nuexperiment-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		D96688EB186EBBDC00683F27 /* objc */ = {
+			isa = PBXGroup;
+			children = (
+				D96688EC186EBBDC00683F27 /* Nu.h */,
+				D96688ED186EBBDC00683F27 /* Nu.m */,
+			);
+			name = objc;
+			path = ../objc;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D943000B186EBA1200879E5D /* nuexperimentTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D9430020186EBA1200879E5D /* Build configuration list for PBXNativeTarget "nuexperimentTests" */;
+			buildPhases = (
+				D9430008186EBA1200879E5D /* Sources */,
+				D9430009186EBA1200879E5D /* Frameworks */,
+				D943000A186EBA1200879E5D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D9430012186EBA1200879E5D /* PBXTargetDependency */,
+			);
+			name = nuexperimentTests;
+			productName = nuexperimentTests;
+			productReference = D943000C186EBA1200879E5D /* nuexperimentTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		D943FFF0186EBA1200879E5D /* nuexperiment */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D943001D186EBA1200879E5D /* Build configuration list for PBXNativeTarget "nuexperiment" */;
+			buildPhases = (
+				CC550D46F9B64268B6234356 /* Check Pods Manifest.lock */,
+				D943FFED186EBA1200879E5D /* Sources */,
+				D943FFEE186EBA1200879E5D /* Frameworks */,
+				D943FFEF186EBA1200879E5D /* Resources */,
+				3B794CE32A2B4034932DE7D9 /* Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = nuexperiment;
+			productName = nuexperiment;
+			productReference = D943FFF1186EBA1200879E5D /* nuexperiment.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D943FFE9186EBA1200879E5D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0500;
+				ORGANIZATIONNAME = dawei;
+				TargetAttributes = {
+					D943000B186EBA1200879E5D = {
+						TestTargetID = D943FFF0186EBA1200879E5D;
+					};
+				};
+			};
+			buildConfigurationList = D943FFEC186EBA1200879E5D /* Build configuration list for PBXProject "nuexperiment" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = D943FFE8186EBA1200879E5D;
+			productRefGroup = D943FFF2186EBA1200879E5D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D943FFF0186EBA1200879E5D /* nuexperiment */,
+				D943000B186EBA1200879E5D /* nuexperimentTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D943000A186EBA1200879E5D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D9430018186EBA1200879E5D /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D943FFEF186EBA1200879E5D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D943FFFF186EBA1200879E5D /* InfoPlist.strings in Resources */,
+				D9430007186EBA1200879E5D /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		3B794CE32A2B4034932DE7D9 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Pods-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CC550D46F9B64268B6234356 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D9430008186EBA1200879E5D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D96688EF186EBBDC00683F27 /* Nu.m in Sources */,
+				D943001A186EBA1200879E5D /* nuexperimentTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D943FFED186EBA1200879E5D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D96688EE186EBBDC00683F27 /* Nu.m in Sources */,
+				D9430005186EBA1200879E5D /* AppDelegate.m in Sources */,
+				D9430001186EBA1200879E5D /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D9430012186EBA1200879E5D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D943FFF0186EBA1200879E5D /* nuexperiment */;
+			targetProxy = D9430011186EBA1200879E5D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		D9430016186EBA1200879E5D /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D9430017186EBA1200879E5D /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		D943FFFD186EBA1200879E5D /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D943FFFE186EBA1200879E5D /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		D943001B186EBA1200879E5D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A233BE988BC1462D8B46EBB7 /* Pods.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D943001C186EBA1200879E5D /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A233BE988BC1462D8B46EBB7 /* Pods.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D943001E186EBA1200879E5D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A233BE988BC1462D8B46EBB7 /* Pods.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "nuexperiment/nuexperiment-Prefix.pch";
+				INFOPLIST_FILE = "nuexperiment/nuexperiment-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		D943001F186EBA1200879E5D /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A233BE988BC1462D8B46EBB7 /* Pods.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "nuexperiment/nuexperiment-Prefix.pch";
+				INFOPLIST_FILE = "nuexperiment/nuexperiment-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		D9430021186EBA1200879E5D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/nuexperiment.app/nuexperiment";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "nuexperiment/nuexperiment-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "nuexperimentTests/nuexperimentTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		D9430022186EBA1200879E5D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/nuexperiment.app/nuexperiment";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "nuexperiment/nuexperiment-Prefix.pch";
+				INFOPLIST_FILE = "nuexperimentTests/nuexperimentTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D943001D186EBA1200879E5D /* Build configuration list for PBXNativeTarget "nuexperiment" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D943001E186EBA1200879E5D /* Debug */,
+				D943001F186EBA1200879E5D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D9430020186EBA1200879E5D /* Build configuration list for PBXNativeTarget "nuexperimentTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D9430021186EBA1200879E5D /* Debug */,
+				D9430022186EBA1200879E5D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D943FFEC186EBA1200879E5D /* Build configuration list for PBXProject "nuexperiment" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D943001B186EBA1200879E5D /* Debug */,
+				D943001C186EBA1200879E5D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D943FFE9186EBA1200879E5D /* Project object */;
+}
