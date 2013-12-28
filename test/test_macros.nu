@@ -50,6 +50,7 @@
         (assert_equal "((set g999__x 22) (set g999__y (+ g999__x 18)))" (newBody stringValue)))
      
      ;; test a macro that adds an ivar with a getter and setter
+
      (- (id) testIvarAccessorMacro is
         (function make-setter-name (oldName)
              (set newName "set")
@@ -89,7 +90,8 @@
                             body:(do (new) (self setValue:new forIvar:__name)))))
         
         (class SomeObject is NSObject
-             (accessor greeting)
+        ;;not necessory?
+             ;;(accessor greeting)
              (- init is
                 (super init)
                 (set @greeting "Hello, there!")
