@@ -52,37 +52,8 @@ typedef void(^TestAnimationBlock)(void);
     self.view.backgroundColor = [UIColor blueColor];
 }
 
-- (RACSignal *) animateWithDuration:(NSTimeInterval) interval animations:(TestAnimationBlock) animation {
-    return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
-        [UIView animateWithDuration:interval animations:^{
-            animation();
-        } completion:^(BOOL finished) {
-            [subscriber sendNext:@(finished)];
-            [subscriber sendCompleted];
-        }];
-        return nil;
-    }];
-}
-
 - (void) viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    
-//    [[[[[[[self animateWithDuration:.7 animations:^{
-//        self.testview.frame = CGRectMake(0, 100, 50, 50);
-//    }] flattenMap:^RACStream *(id value) {
-//        return [self animateWithDuration:.7 animations:^{
-//            self.testview.frame = CGRectMake(100, 100, 50, 50);
-//        }];
-//    }] flattenMap:^RACStream *(id value) {
-//        return [self animateWithDuration:.7 animations:^{
-//            self.testview.frame = CGRectMake(100, 0, 50, 50);
-//        }];
-//    }] flattenMap:^RACStream *(id value) {
-//        return [self animateWithDuration:.7 animations:^{
-//            self.testview.frame = CGRectMake(0, 0, 50, 50);
-//        }];
-//    }] repeat] take:100] subscribeCompleted:^{
-//    }];
     
     [[[[[[[UIView nu_animateWithDuration:.7 animations:^{
         self.testview.frame = CGRectMake(0, 100, 50, 50);
