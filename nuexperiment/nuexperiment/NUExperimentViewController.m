@@ -8,18 +8,23 @@
 
 #import "NUExperimentViewController.h"
 #import <ReactiveCocoa/ReactiveCocoa.h>
+#import "Nu.h"
 
 typedef void(^TestAnimationBlock)(void);
 
 @interface UIView (nu_block_api)
-+ (RACSignal *)nu_animateWithDuration:(NSTimeInterval)duration delay:(NSTimeInterval)delay options:(UIViewAnimationOptions)options animations:(void (^)(void))animations;
-+ (RACSignal *)nu_animateWithDuration:(NSTimeInterval)duration animations:(void (^)(void))animations; // delay = 0.0, options = 0
++ (RACSignal *)nu_animateWithDuration:(NSTimeInterval)duration delay:(NSTimeInterval)delay options:(UIViewAnimationOptions)options animations:(NuBlock *) nu_block_animation;
++ (RACSignal *)nu_animateWithDuration:(NSTimeInterval)duration animations:(NuBlock *) nu_block_animation; // delay = 0.0, options = 0
 @end
 
 @implementation UIView (nu_block_api)
-+ (RACSignal *)nu_animateWithDuration:(NSTimeInterval)duration delay:(NSTimeInterval)delay options:(UIViewAnimationOptions)options animations:(void (^)(void))animations {
++ (RACSignal *)nu_animateWithDuration:(NSTimeInterval)duration delay:(NSTimeInterval)delay options:(UIViewAnimationOptions)options animations:(NuBlock *) nu_block_animation {
+    if (![nu_block_animation respondsToSelector:@selector(evalWithArguments:context:)]) return nil;
+    
     return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
-        [self animateWithDuration:duration delay:delay options:options animations:animations completion:^(BOOL finished) {
+        [self animateWithDuration:duration delay:delay options:options animations:^{
+            [nu_block_animation evalWithArguments:nil context:nil];
+        } completion:^(BOOL finished) {
             [subscriber sendNext:@(finished)];
             [subscriber sendCompleted];
         }];
@@ -27,8 +32,35 @@ typedef void(^TestAnimationBlock)(void);
     }];
 }
 
-+ (RACSignal *) nu_animateWithDuration:(NSTimeInterval)duration animations:(void (^)(void))animations {
-    return [self nu_animateWithDuration:duration delay:0 options:0 animations:animations];
++ (RACSignal *) nu_animateWithDuration:(NSTimeInterval)duration animations:(NuBlock *)nu_block_animation{
+    return [self nu_animateWithDuration:duration delay:0 options:0 animations:nu_block_animation];
+}
+
+@end
+
+@interface RACSignal (nu_block_api)
+- (RACDisposable *) nu_subscribeCompleted:(NuBlock *) complete;
+@end
+
+@implementation RACSignal (nu_block_api)
+- (RACDisposable *) nu_subscribeCompleted:(NuBlock *)complete {
+    if (![complete respondsToSelector:@selector(evalWithArguments:context:)]) return [self subscribeCompleted:^{}];
+    
+    return [self subscribeCompleted:^{
+        [complete evalWithArguments:nil context:nil];
+    }];
+}
+@end
+
+@interface RACStream (nu_block_api)
+- (instancetype)nu_flattenMap:(NuBlock *) nu_block;
+@end
+
+@implementation RACStream (nu_block_api)
+- (instancetype)nu_flattenMap:(NuBlock *) nu_block {
+    return [self flattenMap:^RACStream *(id value) {
+        return [nu_block evalWithArguments:[NuCell cellWithCar:value cdr:nil] context:nil];
+    }];
 }
 
 @end
@@ -50,6 +82,14 @@ typedef void(^TestAnimationBlock)(void);
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor blueColor];
+    [self reEvalNu];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(reEvalNu)];
+}
+
+- (void)reEvalNu {
+    NSURL *nuURL = [[NSBundle mainBundle] URLForResource:@"nuexp" withExtension:@"nu"];
+    NSString *nu = [[NSString alloc] initWithContentsOfURL:nuURL encoding:NSUTF8StringEncoding error:nil];
+    [[Nu sharedParser] parseEval:nu];
 }
 
 - (void) viewDidAppear:(BOOL)animated {
