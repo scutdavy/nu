@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "NUExperimentViewController.h"
 #import "Nu.h"
 
 @implementation AppDelegate
@@ -17,6 +18,9 @@
     // Override point for customization after application launch.
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
+    NUExperimentViewController *controller = [NUExperimentViewController new];
+    UINavigationController *navi = [[UINavigationController alloc] initWithRootViewController:controller];
+    self.window.rootViewController = navi;
     [self runAllNuFeatureTest];
     return YES;
 }

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		353AFE0CF9B340A6878FE185 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 946896237061421598926856 /* libPods.a */; };
+		D901FC8C186ED273003056FC /* NUExperimentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D901FC8B186ED273003056FC /* NUExperimentViewController.m */; };
 		D9430001186EBA1200879E5D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D9430000186EBA1200879E5D /* main.m */; };
 		D9430005186EBA1200879E5D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D9430004186EBA1200879E5D /* AppDelegate.m */; };
 		D9430007186EBA1200879E5D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D9430006186EBA1200879E5D /* Images.xcassets */; };
@@ -83,6 +84,8 @@
 /* Begin PBXFileReference section */
 		946896237061421598926856 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A233BE988BC1462D8B46EBB7 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
+		D901FC8A186ED273003056FC /* NUExperimentViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NUExperimentViewController.h; sourceTree = "<group>"; };
+		D901FC8B186ED273003056FC /* NUExperimentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NUExperimentViewController.m; sourceTree = "<group>"; };
 		D9430000186EBA1200879E5D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		D9430002186EBA1200879E5D /* nuexperiment-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "nuexperiment-Prefix.pch"; sourceTree = "<group>"; };
 		D9430003186EBA1200879E5D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -216,6 +219,8 @@
 				D9430004186EBA1200879E5D /* AppDelegate.m */,
 				D9430006186EBA1200879E5D /* Images.xcassets */,
 				D943FFFB186EBA1200879E5D /* Supporting Files */,
+				D901FC8A186ED273003056FC /* NUExperimentViewController.h */,
+				D901FC8B186ED273003056FC /* NUExperimentViewController.m */,
 			);
 			path = nuexperiment;
 			sourceTree = "<group>";
@@ -481,6 +486,7 @@
 			files = (
 				D96688EE186EBBDC00683F27 /* Nu.m in Sources */,
 				D9430005186EBA1200879E5D /* AppDelegate.m in Sources */,
+				D901FC8C186ED273003056FC /* NUExperimentViewController.m in Sources */,
 				D9430001186EBA1200879E5D /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
