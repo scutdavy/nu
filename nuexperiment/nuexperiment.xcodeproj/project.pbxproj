@@ -63,6 +63,7 @@
 		D96689B0186EC0AE00683F27 /* test_types.nu in Resources */ = {isa = PBXBuildFile; fileRef = D9668952186EC0AE00683F27 /* test_types.nu */; };
 		D96689B2186EC0AE00683F27 /* test_undo.nu in Resources */ = {isa = PBXBuildFile; fileRef = D9668953186EC0AE00683F27 /* test_undo.nu */; };
 		D96689B4186EC0AE00683F27 /* test_varargs.nu in Resources */ = {isa = PBXBuildFile; fileRef = D9668954186EC0AE00683F27 /* test_varargs.nu */; };
+		D982E0B3186FD44F0076BF5D /* test.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D982E0B2186FD44F0076BF5D /* test.jpg */; };
 		D9B5DC45186EC6120082F109 /* beautify.nu in Resources */ = {isa = PBXBuildFile; fileRef = D9B5DC34186EC6120082F109 /* beautify.nu */; };
 		D9B5DC46186EC6120082F109 /* bridgesupport.nu in Resources */ = {isa = PBXBuildFile; fileRef = D9B5DC35186EC6120082F109 /* bridgesupport.nu */; };
 		D9B5DC47186EC6120082F109 /* cblocks.nu in Resources */ = {isa = PBXBuildFile; fileRef = D9B5DC36186EC6120082F109 /* cblocks.nu */; };
@@ -147,6 +148,7 @@
 		D9668952186EC0AE00683F27 /* test_types.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test_types.nu; sourceTree = "<group>"; };
 		D9668953186EC0AE00683F27 /* test_undo.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test_undo.nu; sourceTree = "<group>"; };
 		D9668954186EC0AE00683F27 /* test_varargs.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test_varargs.nu; sourceTree = "<group>"; };
+		D982E0B2186FD44F0076BF5D /* test.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = test.jpg; path = ../Xcode/test.jpg; sourceTree = "<group>"; };
 		D9B5DC34186EC6120082F109 /* beautify.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = beautify.nu; sourceTree = "<group>"; };
 		D9B5DC35186EC6120082F109 /* bridgesupport.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bridgesupport.nu; sourceTree = "<group>"; };
 		D9B5DC36186EC6120082F109 /* cblocks.nu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cblocks.nu; sourceTree = "<group>"; };
@@ -184,6 +186,7 @@
 		D943FFE8186EBA1200879E5D = {
 			isa = PBXGroup;
 			children = (
+				D982E0B2186FD44F0076BF5D /* test.jpg */,
 				D9B5DC33186EC6120082F109 /* nu */,
 				D9668924186EC0AE00683F27 /* test */,
 				D96688EB186EBBDC00683F27 /* objc */,
@@ -423,6 +426,7 @@
 				D966896C186EC0AE00683F27 /* test_enumerable.nu in Resources */,
 				D966896E186EC0AE00683F27 /* test_errors.nu in Resources */,
 				D966897A186EC0AE00683F27 /* test_macros.nu in Resources */,
+				D982E0B3186FD44F0076BF5D /* test.jpg in Resources */,
 				D96689B2186EC0AE00683F27 /* test_undo.nu in Resources */,
 				D966895A186EC0AE00683F27 /* test_blockargs.nu in Resources */,
 				D9668984186EC0AE00683F27 /* test_memory.nu in Resources */,

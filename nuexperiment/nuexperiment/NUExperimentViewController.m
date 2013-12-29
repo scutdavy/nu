@@ -67,22 +67,30 @@ typedef void(^TestAnimationBlock)(void);
 
 @interface NUExperimentViewController ()
 @property (nonatomic, strong) UIView *testview;
+@property (nonatomic, strong) UIImage *image;
 @end
 
 
 @implementation NUExperimentViewController
+
+- (instancetype) init {
+    self = [super init];
+    if (self == nil) return nil;
+    [self reEvalNu];
+    return self;
+}
 
 - (void) loadView {
     [super loadView];
     self.testview = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
     self.testview.backgroundColor = [UIColor greenColor];
     [self.view addSubview:self.testview];
+    self.image = [UIImage imageNamed:@"test.jpg"];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor blueColor];
-    [self reEvalNu];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(reEvalNu)];
 }
 
